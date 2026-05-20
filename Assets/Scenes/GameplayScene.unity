@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 719678}
   - component: {fileID: 719677}
   m_Layer: 5
-  m_Name: ui_panel_group_bar_background
+  m_Name: ui_image_bar_background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -435,7 +435,7 @@ GameObject:
   - component: {fileID: 48136009}
   - component: {fileID: 48136008}
   m_Layer: 5
-  m_Name: ui_panel_inventory_background
+  m_Name: ui_image_inventory_background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -986,7 +986,7 @@ GameObject:
   - component: {fileID: 270184124}
   - component: {fileID: 270184123}
   m_Layer: 5
-  m_Name: ui_panel_group_bar_border
+  m_Name: ui_image_bar_border
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2109,7 +2109,7 @@ GameObject:
   - component: {fileID: 720655349}
   - component: {fileID: 720655348}
   m_Layer: 5
-  m_Name: ui_panel_inventory_border
+  m_Name: ui_image_inventory_border
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2318,7 +2318,7 @@ GameObject:
   m_Component:
   - component: {fileID: 761749730}
   m_Layer: 5
-  m_Name: ui_group_bar_stages
+  m_Name: ui_panel_bar_stages
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2802,7 +2802,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1004866892}
   m_Layer: 5
-  m_Name: ui_panel_spin_gold_info
+  m_Name: ui_panel_area_gold
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3406,7 +3406,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1314187977}
   m_Layer: 5
-  m_Name: ui_panel_spin_silver_info
+  m_Name: ui_panel_area_silver
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3632,7 +3632,7 @@ GameObject:
   - component: {fileID: 1543062142}
   - component: {fileID: 1543062141}
   m_Layer: 5
-  m_Name: ui_image_bar_stage_current_border
+  m_Name: ui_image_bar_stage_current
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4288,7 +4288,7 @@ GameObject:
   - component: {fileID: 1717058257}
   - component: {fileID: 1717058256}
   m_Layer: 5
-  m_Name: ui_text_silver_value
+  m_Name: ui_text_area_silver_value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4683,7 +4683,7 @@ GameObject:
   - component: {fileID: 2048620535}
   - component: {fileID: 2048620534}
   m_Layer: 5
-  m_Name: ui_text_gold_value
+  m_Name: ui_text_area_gold_value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

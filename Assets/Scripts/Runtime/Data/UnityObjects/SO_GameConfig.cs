@@ -10,5 +10,6 @@ namespace Runtime.Data.UnityObjects
         public SO_WheelConfig normalWheel;
         public SO_WheelConfig silverWheel;
         public SO_WheelConfig goldWheel;
+        public SO_StageConfig stageConfig;
     }
 }

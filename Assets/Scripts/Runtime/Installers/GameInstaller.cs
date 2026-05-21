@@ -1,4 +1,5 @@
-﻿using Runtime.Core;
+﻿using DG.Tweening;
+using Runtime.Core;
 using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace Runtime.Installers
 
         public override void InstallBindings()
         {
+            DOTween.Init();
             Container.BindInstance(gameConfig).AsSingle();
             Container.BindInstance(new System.Random()).AsSingle();
             Container.Bind<IZoneManager>().To<ZoneManager>().AsSingle();

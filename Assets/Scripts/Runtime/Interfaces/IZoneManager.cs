@@ -12,6 +12,7 @@ namespace Runtime.Interfaces
         event Action<int> OnZoneChanged;
 
         SO_WheelConfig GetCurrentWheelConfig();
+        RewardSet GetCurrentRewardSet(SO_WheelConfig config);
         void AdvanceZone();
     }
 }

@@ -11,25 +11,23 @@ namespace Runtime.Core
         private readonly IInventoryManager _inventoryManager;
         private readonly System.Random _random;
         private readonly RewardCalculator _rewardCalculator;
-        private readonly SO_GameConfig _gameConfig;
 
         public event Action<RewardEntry> OnSpinCompleted;
         public event Action OnBombHit;
 
         public SpinManager(IZoneManager zoneManager, IInventoryManager inventoryManager, System.Random random,
-            RewardCalculator rewardCalculator, SO_GameConfig gameConfig)
+            RewardCalculator rewardCalculator)
         {
             _zoneManager = zoneManager;
             _inventoryManager = inventoryManager;
             _random = random;
             _rewardCalculator = rewardCalculator;
-            _gameConfig = gameConfig;
         }
 
         public void Spin()
         {
             var config = _zoneManager.GetCurrentWheelConfig();
-            var rewardSet = GetCurrentRewardSet(config);
+            var rewardSet = _zoneManager.GetCurrentRewardSet(config);
             var result = rewardSet.rewards[_random.Next(0, rewardSet.rewards.Length)];
 
             if (result.item.isBomb)
@@ -43,12 +41,5 @@ namespace Runtime.Core
             OnSpinCompleted?.Invoke(result);
         }
 
-        private RewardSet GetCurrentRewardSet(SO_WheelConfig config)
-        {
-            var zone = _zoneManager.CurrentZone;
-            var index = (int)((float)(zone - 1) / _gameConfig.goldZoneInterval * config.rewardSets.Length);
-            index = Math.Clamp(index, 0, config.rewardSets.Length - 1);
-            return config.rewardSets[index];
-        }
     }
 }

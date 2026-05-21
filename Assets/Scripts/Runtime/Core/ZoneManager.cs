@@ -35,6 +35,13 @@ namespace Runtime.Core
             };
         }
 
+        public RewardSet GetCurrentRewardSet(SO_WheelConfig config)
+        {
+            var index = (int)((float)(_currentZone - 1) / _gameConfig.goldZoneInterval * config.rewardSets.Length);
+            index = Math.Clamp(index, 0, config.rewardSets.Length - 1);
+            return config.rewardSets[index];
+        }
+
         public void AdvanceZone()
         {
             _currentZone++;

@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9462704a9a687b47a10890d081c1f3f, type: 3}
+  m_Name: SO_WheelConfig_Silver
+  m_EditorClassIdentifier: 
+  rewardSets:
+  - rewards:
+    - item: {fileID: 11400000, guid: d0ec9c8cf697d534089353d46e18d3b0, type: 2}
+      minAmount: 250
+      maxAmount: 550
+    - item: {fileID: 11400000, guid: c57528c5c3d3f0941a0a2bcb9c8f4533, type: 2}
+      minAmount: 45
+      maxAmount: 105
+    - item: {fileID: 11400000, guid: b6ab8f13f4854de45893f8198dce34f7, type: 2}
+      minAmount: 15
+      maxAmount: 25
+    - item: {fileID: 11400000, guid: 322856f6a97c6fb4f96cd1d1a1468a2b, type: 2}
+      minAmount: 15
+      maxAmount: 25
+    - item: {fileID: 11400000, guid: 18ab2b9c5ee6e3940ba426a52e753b8b, type: 2}
+      minAmount: 0
+      maxAmount: 0
+    - item: {fileID: 11400000, guid: b9b5fc22b3e47fa4a85e5293276879f7, type: 2}
+      minAmount: 5
+      maxAmount: 7
+    - item: {fileID: 11400000, guid: 18ab2b9c5ee6e3940ba426a52e753b8b, type: 2}
+      minAmount: 0
+      maxAmount: 0
+    - item: {fileID: 11400000, guid: d0ec9c8cf697d534089353d46e18d3b0, type: 2}
+      minAmount: 150
+      maxAmount: 770

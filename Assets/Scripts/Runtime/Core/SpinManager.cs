@@ -18,6 +18,7 @@ namespace Runtime.Core
         public event Action<RewardEntry> OnSpinCompleted;
         public event Action OnBombHit;
         public event Action OnGameResumed;
+        public event Action OnRewardsRequested;
 
         public SpinManager(IZoneManager zoneManager, IInventoryManager inventoryManager, System.Random random,
             RewardCalculator rewardCalculator)
@@ -38,6 +39,7 @@ namespace Runtime.Core
         }
 
         public void Continue() => OnGameResumed?.Invoke();
+        public void RequestRewards() => OnRewardsRequested?.Invoke();
 
         public void CommitSpinResult()
         {

@@ -37,6 +37,7 @@ namespace Runtime.UI
             _spinManager.OnSpinDecision += OnSpinStarted;
             _spinManager.OnSpinCompleted += OnSpinEnded;
             _spinManager.OnGameResumed += OnSpinResumed;
+            _exitButton.onClick.AddListener(OnExitClicked);
         }
 
         private void OnDestroy()
@@ -49,11 +50,13 @@ namespace Runtime.UI
                 _spinManager.OnSpinCompleted -= OnSpinEnded;
                 _spinManager.OnGameResumed -= OnSpinResumed;
             }
+            _exitButton.onClick.RemoveListener(OnExitClicked);
         }
 
         private void OnSpinStarted(int _, RewardEntry __) => _exitButton.interactable = false;
         private void OnSpinEnded(RewardEntry _) => _exitButton.interactable = true;
         private void OnSpinResumed() => _exitButton.interactable = true;
+        private void OnExitClicked() => _spinManager.RequestRewards();
 
         private void HandleItemAdded(ItemData item, bool isNew)
         {

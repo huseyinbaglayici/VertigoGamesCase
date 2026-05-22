@@ -9,8 +9,10 @@ namespace Runtime.Interfaces
         event Action<RewardEntry> OnSpinCompleted;
         event Action OnBombHit;
         event Action OnGameResumed;
+        event Action OnRewardsRequested;
         void Spin();
         void CommitSpinResult();
         void Continue();
+        void RequestRewards();
     }
 }

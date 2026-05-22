@@ -46,7 +46,10 @@ namespace Runtime.Core
         public void AdvanceZone()
         {
             _currentZone++;
-            OnZoneChanged?.Invoke(_currentZone);
+            if (_currentZone > _gameConfig.goldZoneInterval)
+                OnGameCompleted?.Invoke();
+            else
+                OnZoneChanged?.Invoke(_currentZone);
         }
     }
 }

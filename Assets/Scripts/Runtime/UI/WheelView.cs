@@ -39,6 +39,7 @@ namespace Runtime.UI
         private IZoneManager _zoneManager;
         private SO_GameConfig _gameConfig;
         private bool _isSpinning;
+        private bool _gameCompleted;
 
         [Inject]
         public void Construct(ISpinManager spinManager, IZoneManager zoneManager, SO_GameConfig gameConfig)
@@ -61,6 +62,7 @@ namespace Runtime.UI
             _spinButton.onClick.AddListener(OnSpinClicked);
             _spinManager.OnSpinDecision += HandleSpinDecision;
             _spinManager.OnGameResumed += HandleGameResumed;
+            _zoneManager.OnGameCompleted += HandleGameCompleted;
             InitSlots();
             yield return new WaitForEndOfFrame();
             _wheelContent.DOPunchScale(Vector3.one * _introPunchScale, _introPunchDuration, _introPunchVibrato, _introPunchElasticity)
@@ -75,6 +77,8 @@ namespace Runtime.UI
                 _spinManager.OnSpinDecision -= HandleSpinDecision;
                 _spinManager.OnGameResumed -= HandleGameResumed;
             }
+            if (_zoneManager != null)
+                _zoneManager.OnGameCompleted -= HandleGameCompleted;
             _wheelContent.DOKill();
         }
 
@@ -88,6 +92,7 @@ namespace Runtime.UI
         private void HandleSpinDecision(int slotIndex, RewardEntry result)
         {
             _wheelContent.DOKill();
+            _wheelContent.localScale = Vector3.one;
 
             float slotAngle = GetSlotAngleDeg(slotIndex);
             float currentZ = _wheelContent.eulerAngles.z;
@@ -108,7 +113,7 @@ namespace Runtime.UI
                 .OnComplete(() =>
                 {
                     _spinManager.CommitSpinResult();
-                    if (isBomb) return;
+                    if (isBomb || _gameCompleted) return;
                     RefreshSlotData();
                     SetSpinning(false);
                     StartIdleAnimation();
@@ -119,6 +124,13 @@ namespace Runtime.UI
         {
             SetSpinning(false);
             StartIdleAnimation();
+        }
+
+        private void HandleGameCompleted()
+        {
+            _gameCompleted = true;
+            _wheelContent.DOKill();
+            SetSpinning(true);
         }
 
         private void SetSpinning(bool spinning)

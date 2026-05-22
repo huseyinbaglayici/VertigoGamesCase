@@ -1,3 +1,4 @@
+using System.Collections;
 using DG.Tweening;
 using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
@@ -10,16 +11,34 @@ namespace Runtime.UI
     public class WheelView : MonoBehaviour
     {
         [SerializeField] private RectTransform _wheelContent;
+        [SerializeField] private Image _wheelBaseImage;
+        [SerializeField] private Image _indicatorImage;
         [SerializeField] private Button _spinButton;
         [SerializeField] private WheelSlotView[] _slotViews;
         [SerializeField] private GameObject _cellPrefab;
+
+        [Header("Idle")]
         [SerializeField] private float _idleRotationDuration = 20f;
         [SerializeField] private float _idleBreatheDuration = 2f;
         [SerializeField] private float _idleBreatheScale = 1.02f;
 
+        [Header("Intro")]
+        [SerializeField] private float _introPunchScale = 0.3f;
+        [SerializeField] private float _introPunchDuration = 0.5f;
+        [SerializeField] private int _introPunchVibrato = 5;
+        [SerializeField] private float _introPunchElasticity = 0.5f;
+
+        [Header("Spin")]
+        [SerializeField] private float _spinDuration = 3f;
+        [SerializeField] private int _spinFullRotations = 5;
+        [SerializeField] private Ease _spinEase = Ease.InOutCubic;
+        // Indicator position in standard math degrees (CCW from +X). 90 = top (+Y).
+        [SerializeField] private float _indicatorAngle = 90f;
+
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
         private SO_GameConfig _gameConfig;
+        private bool _isSpinning;
 
         [Inject]
         public void Construct(ISpinManager spinManager, IZoneManager zoneManager, SO_GameConfig gameConfig)
@@ -37,41 +56,109 @@ namespace Runtime.UI
                 _slotViews = GetComponentsInChildren<WheelSlotView>();
         }
 
-        private void Start()
+        private IEnumerator Start()
         {
             _spinButton.onClick.AddListener(OnSpinClicked);
-            SetupSlots();
-            StartIdleAnimation();
+            _spinManager.OnSpinDecision += HandleSpinDecision;
+            _spinManager.OnGameResumed += HandleGameResumed;
+            InitSlots();
+            yield return new WaitForEndOfFrame();
+            _wheelContent.DOPunchScale(Vector3.one * _introPunchScale, _introPunchDuration, _introPunchVibrato, _introPunchElasticity)
+                .OnComplete(StartIdleAnimation);
         }
 
         private void OnDestroy()
         {
             _spinButton.onClick.RemoveListener(OnSpinClicked);
+            if (_spinManager != null)
+            {
+                _spinManager.OnSpinDecision -= HandleSpinDecision;
+                _spinManager.OnGameResumed -= HandleGameResumed;
+            }
             _wheelContent.DOKill();
         }
 
         private void OnSpinClicked()
         {
+            if (_isSpinning) return;
+            SetSpinning(true);
             _spinManager.Spin();
         }
 
-        private void SetupSlots()
+        private void HandleSpinDecision(int slotIndex, RewardEntry result)
+        {
+            _wheelContent.DOKill();
+
+            float slotAngle = GetSlotAngleDeg(slotIndex);
+            float currentZ = _wheelContent.eulerAngles.z;
+
+            // targetZ: the wheel Z that brings slotAngle to _indicatorAngle
+            float targetZ = ((_indicatorAngle - slotAngle) % 360f + 360f) % 360f;
+
+            // Clockwise (decreasing Z) distance from currentZ to targetZ
+            float cwDistance = currentZ - targetZ;
+            if (cwDistance < 10f) cwDistance += 360f;
+            cwDistance += _spinFullRotations * 360f;
+
+            bool isBomb = result.item.isBomb;
+
+            _wheelContent.DORotate(new Vector3(0f, 0f, -cwDistance), _spinDuration, RotateMode.FastBeyond360)
+                .SetRelative()
+                .SetEase(_spinEase)
+                .OnComplete(() =>
+                {
+                    _spinManager.CommitSpinResult();
+                    if (isBomb) return;
+                    RefreshSlotData();
+                    SetSpinning(false);
+                    StartIdleAnimation();
+                });
+        }
+
+        private void HandleGameResumed()
+        {
+            SetSpinning(false);
+            StartIdleAnimation();
+        }
+
+        private void SetSpinning(bool spinning)
+        {
+            _isSpinning = spinning;
+            _spinButton.interactable = !spinning;
+        }
+
+        private float GetSlotAngleDeg(int slotIndex)
+        {
+            Vector2 localPos = _slotViews[slotIndex].transform.localPosition;
+            return Mathf.Atan2(localPos.y, localPos.x) * Mathf.Rad2Deg;
+        }
+
+        private void InitSlots()
+        {
+            for (int i = 0; i < _slotViews.Length; i++)
+                _slotViews[i].Init(_cellPrefab);
+
+            RefreshSlotData();
+        }
+
+        private void RefreshSlotData()
         {
             var config = _zoneManager.GetCurrentWheelConfig();
             var rewardSet = _zoneManager.GetCurrentRewardSet(config);
 
+            _wheelBaseImage.sprite = config.baseSprite;
+            _indicatorImage.sprite = config.indicatorSprite;
+
             for (int i = 0; i < _slotViews.Length; i++)
-            {
-                _slotViews[i].Init(_cellPrefab);
                 _slotViews[i].Setup(rewardSet.rewards[i], _zoneManager.CurrentZone, _gameConfig.goldZoneInterval);
-            }
         }
 
         private void StartIdleAnimation()
         {
-            _wheelContent.DORotate(new Vector3(0, 0, -360), _idleRotationDuration, RotateMode.FastBeyond360)
+            _wheelContent.DORotate(new Vector3(0f, 0f, -360f), _idleRotationDuration, RotateMode.FastBeyond360)
+                .SetRelative()
                 .SetEase(Ease.Linear)
-                .SetLoops(-1, LoopType.Restart);
+                .SetLoops(-1, LoopType.Incremental);
 
             _wheelContent.DOScale(Vector3.one * _idleBreatheScale, _idleBreatheDuration)
                 .SetEase(Ease.InOutSine)

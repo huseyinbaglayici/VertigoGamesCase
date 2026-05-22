@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9462704a9a687b47a10890d081c1f3f, type: 3}
   m_Name: SO_WheelConfig_Gold
   m_EditorClassIdentifier: 
+  baseSprite: {fileID: 21300000, guid: 703f58c0552790a48a615b8571ea7706, type: 3}
+  indicatorSprite: {fileID: 21300000, guid: 0435bfb23ea9e7c4787a98b6ccd60e81, type: 3}
   rewardSets: []

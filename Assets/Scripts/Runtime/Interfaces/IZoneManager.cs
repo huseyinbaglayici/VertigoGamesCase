@@ -10,6 +10,7 @@ namespace Runtime.Interfaces
         ZoneType GetZoneType(int zone);
 
         event Action<int> OnZoneChanged;
+        event Action OnGameCompleted;
 
         SO_WheelConfig GetCurrentWheelConfig();
         RewardSet GetCurrentRewardSet(SO_WheelConfig config);

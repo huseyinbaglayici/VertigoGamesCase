@@ -4,6 +4,7 @@ using DG.Tweening;
 using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace Runtime.UI
@@ -21,17 +22,24 @@ namespace Runtime.UI
         [SerializeField] private RectTransform _currentStageFrame;
 
         private IZoneManager _zoneManager;
+        private ISpinManager _spinManager;
         private SO_GameConfig _gameConfig;
 
         private readonly List<StageItemView> _stageItems = new();
+        private float _stageWidth;
+        private float _spacing;
 
-        private float StageWidth => _stagePrefab.GetComponent<RectTransform>().rect.width;
-        private float Spacing => _stagesContent.GetComponent<UnityEngine.UI.HorizontalLayoutGroup>().spacing;
+        private void Awake()
+        {
+            _stageWidth = _stagePrefab.GetComponent<RectTransform>().rect.width;
+            _spacing = _stagesContent.GetComponent<HorizontalLayoutGroup>().spacing;
+        }
 
         [Inject]
-        public void Construct(IZoneManager zoneManager, SO_GameConfig gameConfig)
+        public void Construct(IZoneManager zoneManager, ISpinManager spinManager, SO_GameConfig gameConfig)
         {
             _zoneManager = zoneManager;
+            _spinManager = spinManager;
             _gameConfig = gameConfig;
         }
 
@@ -39,6 +47,7 @@ namespace Runtime.UI
         {
             yield return InstantiateStages();
             _zoneManager.OnZoneChanged += OnZoneChanged;
+            _spinManager.OnGameResumed += OnGameResumed;
             yield return new WaitForEndOfFrame();
             SlideToZone(_zoneManager.CurrentZone);
             PunchFrame();
@@ -46,7 +55,10 @@ namespace Runtime.UI
 
         private void OnDestroy()
         {
-            _zoneManager.OnZoneChanged -= OnZoneChanged;
+            if (_zoneManager != null)
+                _zoneManager.OnZoneChanged -= OnZoneChanged;
+            if (_spinManager != null)
+                _spinManager.OnGameResumed -= OnGameResumed;
         }
 
         private IEnumerator InstantiateStages()
@@ -69,6 +81,13 @@ namespace Runtime.UI
             PunchFrame();
         }
 
+        private void OnGameResumed()
+        {
+            int currentIndex = _zoneManager.CurrentZone - 1;
+            if (currentIndex >= 0 && currentIndex < _stageItems.Count)
+                _stageItems[currentIndex].Restore();
+        }
+
         private void FadeOutPreviousStage(int currentZone)
         {
             int prevIndex = currentZone - 2;
@@ -78,7 +97,7 @@ namespace Runtime.UI
 
         private void SlideToZone(int zone)
         {
-            float targetX = -((zone - 1) * (StageWidth + Spacing)) - (StageWidth / 2f);
+            float targetX = -((zone - 1) * (_stageWidth + _spacing)) - (_stageWidth / 2f);
             _stagesContent.DOAnchorPosX(targetX, _slideDuration).SetEase(Ease.OutCubic);
         }
 

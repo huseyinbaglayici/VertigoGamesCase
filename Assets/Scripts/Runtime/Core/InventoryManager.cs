@@ -20,8 +20,6 @@ namespace Runtime.Core
                 existingItem.Amount += item.Amount;
                 OnItemAdded?.Invoke(existingItem, false);
             }
-
-
             else
             {
                 _items.Add(item);

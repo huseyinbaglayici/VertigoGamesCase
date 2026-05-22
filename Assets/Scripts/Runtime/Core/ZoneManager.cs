@@ -12,6 +12,7 @@ namespace Runtime.Core
 
         public int CurrentZone => _currentZone;
         public event Action<int> OnZoneChanged;
+        public event Action OnGameCompleted;
 
         public ZoneManager(SO_GameConfig gameConfig)
         {

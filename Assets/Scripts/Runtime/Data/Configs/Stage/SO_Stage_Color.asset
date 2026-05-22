@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: SO_Stage_Color
   m_EditorClassIdentifier: 
   normalColor: {r: 0.9960785, g: 0.9960785, b: 0.9960785, a: 1}
-  silverColor: {r: 0.22352943, g: 0.4039216, b: 0, a: 1}
+  silverColor: {r: 0.24705884, g: 0.4431373, b: 0, a: 1}
   goldColor: {r: 0.90196085, g: 0.5176471, b: 0.019607844, a: 1}

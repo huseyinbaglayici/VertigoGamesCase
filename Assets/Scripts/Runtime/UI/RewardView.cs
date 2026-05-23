@@ -1,7 +1,6 @@
 using DG.Tweening;
 using Runtime.Interfaces;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
 
@@ -18,6 +17,7 @@ namespace Runtime.UI
         private IInventoryManager _inventoryManager;
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
+        private SceneTransitionView _transition;
 
         private const string CollectButtonName = "ui_button_reward_exit";
 
@@ -30,11 +30,12 @@ namespace Runtime.UI
         }
 
         [Inject]
-        public void Construct(IInventoryManager inventoryManager, ISpinManager spinManager, IZoneManager zoneManager)
+        public void Construct(IInventoryManager inventoryManager, ISpinManager spinManager, IZoneManager zoneManager, SceneTransitionView transition)
         {
             _inventoryManager = inventoryManager;
             _spinManager = spinManager;
             _zoneManager = zoneManager;
+            _transition = transition;
 
             _spinManager.OnRewardsRequested += Show;
             _zoneManager.OnGameCompleted += Show;
@@ -68,6 +69,6 @@ namespace Runtime.UI
             }
         }
 
-        private void OnCollectClicked() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        private void OnCollectClicked() => _transition.FadeAndLoad();
     }
 }

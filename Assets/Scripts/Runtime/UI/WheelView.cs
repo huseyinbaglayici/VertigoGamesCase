@@ -36,15 +36,17 @@ namespace Runtime.UI
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
         private SO_GameConfig _gameConfig;
+        private SceneTransitionView _transition;
         private bool _isSpinning;
         private bool _gameCompleted;
 
         [Inject]
-        public void Construct(ISpinManager spinManager, IZoneManager zoneManager, SO_GameConfig gameConfig)
+        public void Construct(ISpinManager spinManager, IZoneManager zoneManager, SO_GameConfig gameConfig, SceneTransitionView transition)
         {
             _spinManager = spinManager;
             _zoneManager = zoneManager;
             _gameConfig = gameConfig;
+            _transition = transition;
         }
 
         private void OnValidate()
@@ -63,10 +65,25 @@ namespace Runtime.UI
             _zoneManager.OnGameCompleted += HandleGameCompleted;
             yield return null;
             RefreshSlotData();
-            yield return new WaitForEndOfFrame();
+            _transition.OnOpened += PlayIntro;
+            if (_transition.HasOpened)
+            {
+                _transition.OnOpened -= PlayIntro;
+                PlayIntro();
+            }
+        }
+
+        private void PlayIntro()
+        {
+            _transition.OnOpened -= PlayIntro;
             _wheelContent.DOPunchScale(Vector3.one * _introPunchScale, _introPunchDuration, _introPunchVibrato,
                     _introPunchElasticity)
                 .OnComplete(StartIdleAnimation);
+
+            _spinButton.transform.localScale = Vector3.zero;
+            _spinButton.transform.DOScale(Vector3.one, _introPunchDuration)
+                .SetEase(Ease.OutBack)
+                .SetDelay(_introPunchDuration * 0.3f);
         }
 
         private void OnDestroy()
@@ -77,9 +94,10 @@ namespace Runtime.UI
                 _spinManager.OnSpinDecision -= HandleSpinDecision;
                 _spinManager.OnGameResumed -= HandleGameResumed;
             }
-
             if (_zoneManager != null)
                 _zoneManager.OnGameCompleted -= HandleGameCompleted;
+            if (_transition != null)
+                _transition.OnOpened -= PlayIntro;
             _wheelContent.DOKill();
         }
 

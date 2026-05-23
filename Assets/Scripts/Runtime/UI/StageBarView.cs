@@ -23,25 +23,25 @@ namespace Runtime.UI
         private IZoneManager _zoneManager;
         private ISpinManager _spinManager;
         private SO_GameConfig _gameConfig;
+        private SceneTransitionView _transition;
 
         private readonly List<StageItemView> _stageItems = new();
 
         [Inject]
-        public void Construct(IZoneManager zoneManager, ISpinManager spinManager, SO_GameConfig gameConfig)
+        public void Construct(IZoneManager zoneManager, ISpinManager spinManager, SO_GameConfig gameConfig, SceneTransitionView transition)
         {
             _zoneManager = zoneManager;
             _spinManager = spinManager;
             _gameConfig = gameConfig;
+            _transition = transition;
         }
 
-        private IEnumerator Start()
+        private void Start()
         {
-            yield return InstantiateStages();
             _zoneManager.OnZoneChanged += OnZoneChanged;
             _spinManager.OnGameResumed += OnGameResumed;
-            yield return new WaitForEndOfFrame();
-            SlideToZone(_zoneManager.CurrentZone);
-            PunchFrame();
+            _transition.OnOpened += PlayIntro;
+            StartCoroutine(InstantiateStages());
         }
 
         private void OnDestroy()
@@ -50,6 +50,22 @@ namespace Runtime.UI
                 _zoneManager.OnZoneChanged -= OnZoneChanged;
             if (_spinManager != null)
                 _spinManager.OnGameResumed -= OnGameResumed;
+            if (_transition != null)
+                _transition.OnOpened -= PlayIntro;
+        }
+
+        private void PlayIntro()
+        {
+            _transition.OnOpened -= PlayIntro;
+            StartCoroutine(IntroSlide());
+        }
+
+        private IEnumerator IntroSlide()
+        {
+            yield return new WaitForEndOfFrame();
+            SlideToZone(_zoneManager.CurrentZone);
+            _stageItems[_zoneManager.CurrentZone - 1].Activate();
+            PunchFrame();
         }
 
         private IEnumerator InstantiateStages()
@@ -58,8 +74,7 @@ namespace Runtime.UI
             {
                 var go = Instantiate(_stagePrefab, _stagesContent);
                 var view = go.GetComponent<StageItemView>();
-                var zoneType = _zoneManager.GetZoneType(i);
-                view.Setup(i, zoneType, _gameConfig.stageConfig);
+                view.Setup(i, _zoneManager.GetZoneType(i), _gameConfig.stageConfig);
                 _stageItems.Add(view);
                 if (i % _instantiatePerFrame == 0) yield return null;
             }
@@ -69,6 +84,7 @@ namespace Runtime.UI
         {
             FadeOutPreviousStage(zone);
             SlideToZone(zone);
+            _stageItems[zone - 1].Activate();
             PunchFrame();
         }
 
@@ -94,7 +110,7 @@ namespace Runtime.UI
 
         private void PunchFrame()
         {
-            _currentStageFrame.DOPunchScale(Vector3.one * _punchScale, _punchDuration, _punchVibrato, _punchElasticity);
+            _currentStageFrame.DOPunchScale(new Vector3(_punchScale, _punchScale * 0.5f, 0f), _punchDuration, _punchVibrato, _punchElasticity);
         }
     }
 }

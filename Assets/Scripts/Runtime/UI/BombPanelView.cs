@@ -1,6 +1,6 @@
+using DG.Tweening;
 using Runtime.Interfaces;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Zenject;
 
@@ -14,11 +14,16 @@ namespace Runtime.UI
         [SerializeField] private RectTransform _inventoryRoot;
 
         private ISpinManager _spinManager;
+        private SceneTransitionView _transition;
         private Transform _inventoryOriginalParent;
         private int _inventoryOriginalSiblingIndex;
 
         private const string ContinueButtonName = "ui_button_bomb_continue";
         private const string ExitButtonName = "ui_button_bomb_exit";
+
+        [Header("Show Animation")]
+        [SerializeField] private float _showDuration = 0.4f;
+        [SerializeField] private Ease _showEase = Ease.OutBack;
 
         private void OnValidate()
         {
@@ -30,9 +35,10 @@ namespace Runtime.UI
         }
 
         [Inject]
-        public void Construct(ISpinManager spinManager)
+        public void Construct(ISpinManager spinManager, SceneTransitionView transition)
         {
             _spinManager = spinManager;
+            _transition = transition;
             _spinManager.OnBombHit += Show;
             _continueButton.onClick.AddListener(OnContinueClicked);
             _exitButton.onClick.AddListener(OnRestartClicked);
@@ -44,6 +50,7 @@ namespace Runtime.UI
                 _spinManager.OnBombHit -= Show;
             _continueButton.onClick.RemoveListener(OnContinueClicked);
             _exitButton.onClick.RemoveListener(OnRestartClicked);
+            transform.DOKill();
         }
 
         private void Show()
@@ -54,25 +61,29 @@ namespace Runtime.UI
                 _inventoryOriginalSiblingIndex = _inventoryRoot.GetSiblingIndex();
                 _inventoryRoot.SetParent(_inventorySlot, false);
             }
+            transform.localScale = Vector3.zero;
             gameObject.SetActive(true);
+            transform.DOScale(Vector3.one, _showDuration).SetEase(_showEase);
         }
 
         private void Hide()
         {
-            if (_inventoryRoot != null && _inventoryOriginalParent != null)
-            {
-                _inventoryRoot.SetParent(_inventoryOriginalParent, false);
-                _inventoryRoot.SetSiblingIndex(_inventoryOriginalSiblingIndex);
-            }
-            gameObject.SetActive(false);
+            transform.DOScale(Vector3.zero, _showDuration)
+                .SetEase(Ease.InBack)
+                .OnComplete(() =>
+                {
+                    if (_inventoryRoot != null && _inventoryOriginalParent != null)
+                    {
+                        _inventoryRoot.SetParent(_inventoryOriginalParent, false);
+                        _inventoryRoot.SetSiblingIndex(_inventoryOriginalSiblingIndex);
+                    }
+                    gameObject.SetActive(false);
+                    _spinManager.Continue();
+                });
         }
 
-        private void OnContinueClicked()
-        {
-            Hide();
-            _spinManager.Continue();
-        }
+        private void OnContinueClicked() => Hide();
 
-        private void OnRestartClicked() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        private void OnRestartClicked() => _transition.FadeAndLoad();
     }
 }

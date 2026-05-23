@@ -22,12 +22,6 @@ namespace Runtime.UI
         private InventoryView _inventoryView;
         private SignalBus _signalBus;
 
-        private void OnValidate()
-        {
-            if (_particles is { Length: > 0 }) return;
-            _particles = GetComponentsInChildren<Image>(true);
-        }
-
         [Inject]
         public void Construct(InventoryView inventoryView, SignalBus signalBus)
         {
@@ -53,7 +47,8 @@ namespace Runtime.UI
             for (int i = 0; i < _particles.Length; i++)
             {
                 float angle = i * angleStep * Mathf.Deg2Rad;
-                Vector3 worldPos = slotTransform.position + (Vector3)(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * _spreadRadius);
+                Vector3 worldPos = slotTransform.position +
+                                   (Vector3)(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * _spreadRadius);
 
                 _particles[i].transform.DOKill();
                 _particles[i].sprite = entry.item.icon;

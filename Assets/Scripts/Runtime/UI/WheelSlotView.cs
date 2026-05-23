@@ -27,6 +27,7 @@ namespace Runtime.UI
         public void Setup(RewardEntry entry, int currentZone, int totalZones)
         {
             _iconImage.sprite = entry.item.icon;
+            _iconImage.color = Color.white;
             if (entry.item.isBomb)
             {
                 _amountText.text = string.Empty;
@@ -35,6 +36,12 @@ namespace Runtime.UI
             int amount = Mathf.RoundToInt(Mathf.Lerp(entry.minAmount, entry.maxAmount,
                 (float)(currentZone - 1) / (totalZones - 1)));
             _amountText.text = $"x{amount}";
+        }
+
+        public void SetSafe()
+        {
+            _iconImage.color = Color.gray;
+            _amountText.text = "SAFE";
         }
     }
 }

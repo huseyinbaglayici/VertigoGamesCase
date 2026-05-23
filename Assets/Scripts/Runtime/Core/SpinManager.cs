@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
 using Runtime.Interfaces;
@@ -16,6 +17,8 @@ namespace Runtime.Core
         private readonly SignalBus _signalBus;
 
         private RewardEntry _pendingResult;
+        private int _pendingSlotIndex;
+        private readonly HashSet<int> _excludedSlots = new HashSet<int>();
 
         public event Action<int, RewardEntry> OnSpinDecision;
         public event Action<RewardEntry> OnSpinCompleted;
@@ -40,12 +43,32 @@ namespace Runtime.Core
         {
             var config = _zoneManager.GetCurrentWheelConfig();
             var rewardSet = _zoneManager.GetCurrentRewardSet(config);
-            int index = _random.Next(0, rewardSet.rewards.Length);
+
+            int index = _excludedSlots.Count > 0
+                ? PickIndexExcludingSlots(rewardSet.rewards)
+                : _random.Next(0, rewardSet.rewards.Length);
+
+            _pendingSlotIndex = index;
             _pendingResult = rewardSet.rewards[index];
             OnSpinDecision?.Invoke(index, _pendingResult);
-        }   
+        }
 
-        public void Continue() => OnGameResumed?.Invoke();
+        private int PickIndexExcludingSlots(RewardEntry[] rewards)
+        {
+            var pool = new List<int>(rewards.Length);
+            for (int i = 0; i < rewards.Length; i++)
+            {
+                if (!_excludedSlots.Contains(i)) pool.Add(i);
+            }
+            return pool[_random.Next(0, pool.Count)];
+        }
+
+        public void Continue()
+        {
+            _excludedSlots.Add(_pendingSlotIndex);
+            OnGameResumed?.Invoke();
+        }
+
         public void RequestRewards() => OnRewardsRequested?.Invoke();
 
         public void CommitSpinResult()
@@ -61,12 +84,17 @@ namespace Runtime.Core
                 return;
             }
 
+            _excludedSlots.Clear();
             var amount = _rewardCalculator.Calculate(result.minAmount, result.maxAmount, _zoneManager.CurrentZone);
             _inventoryManager.AddItem(new ItemData(result.item, amount));
             _zoneManager.AdvanceZone();
             OnSpinCompleted?.Invoke(result);
         }
 
-        private void OnReset() => _pendingResult = null;
+        private void OnReset()
+        {
+            _pendingResult = null;
+            _excludedSlots.Clear();
+        }
     }
 }

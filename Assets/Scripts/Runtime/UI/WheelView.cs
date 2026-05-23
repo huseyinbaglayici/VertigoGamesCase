@@ -122,6 +122,7 @@ namespace Runtime.UI
                 .SetEase(SpinCurve)
                 .OnComplete(() =>
                 {
+                    if (isBomb) _slotViews[slotIndex].SetSafe();
                     _spinManager.CommitSpinResult();
                     if (isBomb || _gameCompleted) return;
 
@@ -167,6 +168,7 @@ namespace Runtime.UI
 
         private void StartIdleAnimation()
         {
+            if (_isSpinning) return;
             _wheelContent.localEulerAngles = Vector3.zero;
             _wheelContent.DORotate(new Vector3(0f, 0f, -360f), IdleRotationDuration, RotateMode.FastBeyond360)
                 .SetRelative()

@@ -1,8 +1,6 @@
-﻿using DG.Tweening;
-using Runtime.Core;
+using DG.Tweening;
 using Runtime.Data.UnityObjects;
-using Runtime.Interfaces;
-using Runtime.UI;
+using Runtime.Signals;
 using UnityEngine;
 using Zenject;
 
@@ -15,13 +13,12 @@ namespace Runtime.Installers
         public override void InstallBindings()
         {
             DOTween.Init();
+            SignalBusInstaller.Install(Container);
+            Container.DeclareSignal<GameRestartSignal>();
+            Container.DeclareSignal<RewardReadyToFlySignal>();
+            Container.DeclareSignal<RewardFlyCompleteSignal>();
             Container.BindInstance(gameConfig).AsSingle();
-            Container.BindInstance(new System.Random()).AsSingle();
-            Container.Bind<IZoneManager>().To<ZoneManager>().AsSingle();
-            Container.Bind<IInventoryManager>().To<InventoryManager>().AsSingle();
-            Container.Bind<ISpinManager>().To<SpinManager>().AsSingle();
-            Container.Bind<RewardCalculator>().AsSingle();
-            Container.Bind<SceneTransitionView>().FromComponentInHierarchy().AsSingle();
+            CoreInstaller.Install(Container);
         }
     }
 }

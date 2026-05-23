@@ -1,5 +1,6 @@
 using DG.Tweening;
 using Runtime.Interfaces;
+using Runtime.Signals;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -18,6 +19,7 @@ namespace Runtime.UI
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
         private SceneTransitionView _transition;
+        private SignalBus _signalBus;
 
         private const string CollectButtonName = "ui_button_reward_exit";
 
@@ -30,15 +32,17 @@ namespace Runtime.UI
         }
 
         [Inject]
-        public void Construct(IInventoryManager inventoryManager, ISpinManager spinManager, IZoneManager zoneManager, SceneTransitionView transition)
+        public void Construct(IInventoryManager inventoryManager, ISpinManager spinManager, IZoneManager zoneManager,
+            SceneTransitionView transition, SignalBus signalBus)
         {
             _inventoryManager = inventoryManager;
             _spinManager = spinManager;
             _zoneManager = zoneManager;
             _transition = transition;
-
+            _signalBus = signalBus;
             _spinManager.OnRewardsRequested += Show;
             _zoneManager.OnGameCompleted += Show;
+            _signalBus.Subscribe<GameRestartSignal>(HandleReset);
             _collectButton.onClick.AddListener(OnCollectClicked);
         }
 
@@ -46,6 +50,7 @@ namespace Runtime.UI
         {
             if (_spinManager != null) _spinManager.OnRewardsRequested -= Show;
             if (_zoneManager != null) _zoneManager.OnGameCompleted -= Show;
+            if (_signalBus != null) _signalBus.Unsubscribe<GameRestartSignal>(HandleReset);
             _collectButton.onClick.RemoveListener(OnCollectClicked);
         }
 
@@ -69,6 +74,12 @@ namespace Runtime.UI
             }
         }
 
-        private void OnCollectClicked() => _transition.FadeAndLoad();
+        private void HandleReset()
+        {
+            foreach (Transform child in _content) Destroy(child.gameObject);
+            gameObject.SetActive(false);
+        }
+
+        private void OnCollectClicked() => _transition.FadeAndReset(() => _signalBus.Fire<GameRestartSignal>());
     }
 }

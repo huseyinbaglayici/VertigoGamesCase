@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
+using Runtime.Signals;
 using UnityEngine;
 using Zenject;
 
@@ -24,34 +25,36 @@ namespace Runtime.UI
         private ISpinManager _spinManager;
         private SO_GameConfig _gameConfig;
         private SceneTransitionView _transition;
+        private SignalBus _signalBus;
 
         private readonly List<StageItemView> _stageItems = new();
 
         [Inject]
-        public void Construct(IZoneManager zoneManager, ISpinManager spinManager, SO_GameConfig gameConfig, SceneTransitionView transition)
+        public void Construct(IZoneManager zoneManager, ISpinManager spinManager, SO_GameConfig gameConfig,
+            SceneTransitionView transition, SignalBus signalBus)
         {
             _zoneManager = zoneManager;
             _spinManager = spinManager;
             _gameConfig = gameConfig;
             _transition = transition;
+            _signalBus = signalBus;
         }
 
         private void Start()
         {
             _zoneManager.OnZoneChanged += OnZoneChanged;
             _spinManager.OnGameResumed += OnGameResumed;
+            _signalBus.Subscribe<GameRestartSignal>(HandleReset);
             _transition.OnOpened += PlayIntro;
             StartCoroutine(InstantiateStages());
         }
 
         private void OnDestroy()
         {
-            if (_zoneManager != null)
-                _zoneManager.OnZoneChanged -= OnZoneChanged;
-            if (_spinManager != null)
-                _spinManager.OnGameResumed -= OnGameResumed;
-            if (_transition != null)
-                _transition.OnOpened -= PlayIntro;
+            if (_zoneManager != null) _zoneManager.OnZoneChanged -= OnZoneChanged;
+            if (_spinManager != null) _spinManager.OnGameResumed -= OnGameResumed;
+            if (_signalBus != null) _signalBus.Unsubscribe<GameRestartSignal>(HandleReset);
+            if (_transition != null) _transition.OnOpened -= PlayIntro;
         }
 
         private void PlayIntro()
@@ -93,6 +96,11 @@ namespace Runtime.UI
             int currentIndex = _zoneManager.CurrentZone - 1;
             if (currentIndex >= 0 && currentIndex < _stageItems.Count)
                 _stageItems[currentIndex].Restore();
+        }
+
+        private void HandleReset()
+        {
+            foreach (var item in _stageItems) item.Restore();
         }
 
         private void FadeOutPreviousStage(int currentZone)

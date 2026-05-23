@@ -3,26 +3,27 @@ using Runtime.Data.UnityObjects;
 using Runtime.Enums;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Runtime.UI
 {
     public class StageItemView : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI stageText;
+        [SerializeField] private Image backgroundImage;
 
         private const float PassedAlpha = 0.3f;
 
-        private ZoneType _zoneType;
-        private SO_StageConfig _config;
         private Tween _fadeTween;
         private Tween _activateTween;
 
         public void Setup(int zoneNumber, ZoneType zoneType, SO_StageConfig config)
         {
-            _zoneType = zoneType;
-            _config = config;
             stageText.text = zoneNumber.ToString();
-            stageText.color = GetColorForZoneType(zoneType, config);
+
+            if (zoneType == ZoneType.Silver) { backgroundImage.sprite = config.silverIcon; backgroundImage.enabled = true; }
+            else if (zoneType == ZoneType.Gold) { backgroundImage.sprite = config.goldIcon; backgroundImage.enabled = true; }
+            else backgroundImage.enabled = false;
         }
 
         public void Activate()
@@ -34,15 +35,17 @@ namespace Runtime.UI
         public void FadeOutToPassed()
         {
             _fadeTween?.Kill();
-            Color passedColor = GetColorForZoneType(_zoneType, _config);
-            passedColor.a = PassedAlpha;
-            _fadeTween = DOVirtual.Color(stageText.color, passedColor, 0.4f, c => stageText.color = c).SetEase(Ease.InQuad);
+            Color c = stageText.color;
+            c.a = PassedAlpha;
+            _fadeTween = DOVirtual.Color(stageText.color, c, 0.4f, x => stageText.color = x).SetEase(Ease.InQuad);
         }
 
         public void Restore()
         {
             _fadeTween?.Kill();
-            stageText.color = GetColorForZoneType(_zoneType, _config);
+            Color c = stageText.color;
+            c.a = 1f;
+            stageText.color = c;
         }
 
         private void OnDestroy()
@@ -51,14 +54,6 @@ namespace Runtime.UI
             _activateTween?.Kill();
         }
 
-        private Color GetColorForZoneType(ZoneType zoneType, SO_StageConfig config)
-        {
-            return zoneType switch
-            {
-                ZoneType.Gold => config.goldColor,
-                ZoneType.Silver => config.silverColor,
-                _ => config.normalColor
-            };
-        }
+
     }
 }

@@ -33,6 +33,17 @@ namespace Runtime.UI
                 .OnComplete(() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex));
         }
 
+        public void FadeAndReset(Action onReset)
+        {
+            _canvasGroup.DOFade(1f, _fadeDuration)
+                .SetEase(Ease.OutQuad)
+                .OnComplete(() =>
+                {
+                    onReset?.Invoke();
+                    _canvasGroup.DOFade(0f, _fadeDuration).SetEase(Ease.InQuad);
+                });
+        }
+
         private void OnDestroy() => _canvasGroup.DOKill();
     }
 }

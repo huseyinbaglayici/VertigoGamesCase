@@ -2,6 +2,7 @@ using System.Collections;
 using DG.Tweening;
 using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
+using Runtime.Signals;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -10,43 +11,48 @@ namespace Runtime.UI
 {
     public class WheelView : MonoBehaviour
     {
+        #region References & Configuration
+
         [SerializeField] private RectTransform _wheelContent;
         [SerializeField] private Image _wheelBaseImage;
         [SerializeField] private Image _indicatorImage;
         [SerializeField] private Button _spinButton;
         [SerializeField] private WheelSlotView[] _slotViews;
 
-        [Header("Idle")] [SerializeField] private float _idleRotationDuration = 20f;
-        [SerializeField] private float _idleBreatheDuration = 2f;
-        [SerializeField] private float _idleBreatheScale = 1.02f;
+        private const float IdleRotationDuration = 40f;
+        private const float IntroDuration = 0.5f;
+        private const float SpinDuration = 3f;
+        private const int SpinFullRotations = 5;
+        private const float IndicatorAngle = 90f;
 
-        [Header("Intro")] [SerializeField] private float _introPunchScale = 0.3f;
-        [SerializeField] private float _introPunchDuration = 0.5f;
-        [SerializeField] private int _introPunchVibrato = 5;
-        [SerializeField] private float _introPunchElasticity = 0.5f;
-
-        [Header("Spin")] [SerializeField] private float _spinDuration = 3f;
-        [SerializeField] private int _spinFullRotations = 5;
-
-        [SerializeField] private Ease _spinEase = Ease.InOutCubic;
-
-        // Indicator position in standard math degrees (CCW from +X). 90 = top (+Y).
-        [SerializeField] private float _indicatorAngle = 90f;
+        // Non-zero initial slope keeps wheel above idle speed at spin start — prevents perceived pause.
+        private static readonly AnimationCurve SpinCurve = new AnimationCurve(
+            new Keyframe(0f,    0f,   0f,   0.1f),
+            new Keyframe(0.35f, 0.5f, 3.0f, 3.0f),
+            new Keyframe(1f,    1f,   0f,   0f)
+        );
 
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
         private SO_GameConfig _gameConfig;
         private SceneTransitionView _transition;
+        private SignalBus _signalBus;
         private bool _isSpinning;
         private bool _gameCompleted;
 
+        #endregion
+
+        #region Lifecycle
+
         [Inject]
-        public void Construct(ISpinManager spinManager, IZoneManager zoneManager, SO_GameConfig gameConfig, SceneTransitionView transition)
+        public void Construct(ISpinManager spinManager, IZoneManager zoneManager, SO_GameConfig gameConfig,
+            SceneTransitionView transition, SignalBus signalBus)
         {
             _spinManager = spinManager;
             _zoneManager = zoneManager;
             _gameConfig = gameConfig;
             _transition = transition;
+            _signalBus = signalBus;
         }
 
         private void OnValidate()
@@ -63,6 +69,8 @@ namespace Runtime.UI
             _spinManager.OnSpinDecision += HandleSpinDecision;
             _spinManager.OnGameResumed += HandleGameResumed;
             _zoneManager.OnGameCompleted += HandleGameCompleted;
+            _signalBus.Subscribe<GameRestartSignal>(HandleReset);
+            _signalBus.Subscribe<RewardFlyCompleteSignal>(GoIdle);
             yield return null;
             RefreshSlotData();
             _transition.OnOpened += PlayIntro;
@@ -73,19 +81,6 @@ namespace Runtime.UI
             }
         }
 
-        private void PlayIntro()
-        {
-            _transition.OnOpened -= PlayIntro;
-            _wheelContent.DOPunchScale(Vector3.one * _introPunchScale, _introPunchDuration, _introPunchVibrato,
-                    _introPunchElasticity)
-                .OnComplete(StartIdleAnimation);
-
-            _spinButton.transform.localScale = Vector3.zero;
-            _spinButton.transform.DOScale(Vector3.one, _introPunchDuration)
-                .SetEase(Ease.OutBack)
-                .SetDelay(_introPunchDuration * 0.3f);
-        }
-
         private void OnDestroy()
         {
             _spinButton.onClick.RemoveListener(OnSpinClicked);
@@ -94,12 +89,20 @@ namespace Runtime.UI
                 _spinManager.OnSpinDecision -= HandleSpinDecision;
                 _spinManager.OnGameResumed -= HandleGameResumed;
             }
-            if (_zoneManager != null)
-                _zoneManager.OnGameCompleted -= HandleGameCompleted;
-            if (_transition != null)
-                _transition.OnOpened -= PlayIntro;
+            if (_zoneManager != null) _zoneManager.OnGameCompleted -= HandleGameCompleted;
+            if (_transition != null) _transition.OnOpened -= PlayIntro;
+            if (_signalBus != null)
+            {
+                _signalBus.Unsubscribe<GameRestartSignal>(HandleReset);
+                _signalBus.Unsubscribe<RewardFlyCompleteSignal>(GoIdle);
+            }
+            transform.DOKill();
             _wheelContent.DOKill();
         }
+
+        #endregion
+
+        #region Spin
 
         private void OnSpinClicked()
         {
@@ -111,33 +114,69 @@ namespace Runtime.UI
         private void HandleSpinDecision(int slotIndex, RewardEntry result)
         {
             _wheelContent.DOKill();
-            _wheelContent.localScale = Vector3.one;
-
-            float slotAngle = GetSlotAngleDeg(slotIndex);
-            float currentZ = _wheelContent.eulerAngles.z;
-
-            // targetZ: the wheel Z that brings slotAngle to _indicatorAngle
-            float targetZ = ((_indicatorAngle - slotAngle) % 360f + 360f) % 360f;
-
-            // Clockwise (decreasing Z) distance from currentZ to targetZ
-            float cwDistance = currentZ - targetZ;
-            if (cwDistance < 10f) cwDistance += 360f;
-            cwDistance += _spinFullRotations * 360f;
 
             bool isBomb = result.item.isBomb;
 
-            _wheelContent.DORotate(new Vector3(0f, 0f, -cwDistance), _spinDuration, RotateMode.FastBeyond360)
+            _wheelContent.DORotate(new Vector3(0f, 0f, -ComputeCwDistance(slotIndex)), SpinDuration, RotateMode.FastBeyond360)
                 .SetRelative()
-                .SetEase(_spinEase)
+                .SetEase(SpinCurve)
                 .OnComplete(() =>
                 {
                     _spinManager.CommitSpinResult();
                     if (isBomb || _gameCompleted) return;
-                    RefreshSlotData();
-                    SetSpinning(false);
-                    StartIdleAnimation();
+
+                    _signalBus.Fire(new RewardReadyToFlySignal
+                    {
+                        SlotTransform = _slotViews[slotIndex].transform,
+                        Entry = result
+                    });
                 });
         }
+
+        private float ComputeCwDistance(int slotIndex)
+        {
+            float slotAngle = Mathf.Atan2(
+                _slotViews[slotIndex].transform.localPosition.y,
+                _slotViews[slotIndex].transform.localPosition.x) * Mathf.Rad2Deg;
+
+            float targetZ = ((IndicatorAngle - slotAngle) % 360f + 360f) % 360f;
+            float cwDistance = _wheelContent.eulerAngles.z - targetZ;
+            if (cwDistance < 10f) cwDistance += 360f;
+            return cwDistance + SpinFullRotations * 360f;
+        }
+
+        #endregion
+
+        #region Animation
+
+        private void PlayIntro()
+        {
+            _transition.OnOpened -= PlayIntro;
+            transform.localScale = Vector3.zero;
+            transform.DOScale(Vector3.one, IntroDuration)
+                .SetEase(Ease.OutBack)
+                .OnComplete(StartIdleAnimation);
+        }
+
+        private void GoIdle()
+        {
+            RefreshSlotData();
+            SetSpinning(false);
+            StartIdleAnimation();
+        }
+
+        private void StartIdleAnimation()
+        {
+            _wheelContent.localEulerAngles = Vector3.zero;
+            _wheelContent.DORotate(new Vector3(0f, 0f, -360f), IdleRotationDuration, RotateMode.FastBeyond360)
+                .SetRelative()
+                .SetEase(Ease.Linear)
+                .SetLoops(-1, LoopType.Incremental);
+        }
+
+        #endregion
+
+        #region State
 
         private void HandleGameResumed()
         {
@@ -152,40 +191,29 @@ namespace Runtime.UI
             SetSpinning(true);
         }
 
+        private void HandleReset()
+        {
+            _gameCompleted = false;
+            _wheelContent.DOKill();
+            GoIdle();
+        }
+
         private void SetSpinning(bool spinning)
         {
             _isSpinning = spinning;
             _spinButton.interactable = !spinning;
         }
 
-        private float GetSlotAngleDeg(int slotIndex)
-        {
-            Vector2 localPos = _slotViews[slotIndex].transform.localPosition;
-            return Mathf.Atan2(localPos.y, localPos.x) * Mathf.Rad2Deg;
-        }
-
         private void RefreshSlotData()
         {
             var config = _zoneManager.GetCurrentWheelConfig();
             var rewardSet = _zoneManager.GetCurrentRewardSet(config);
-
             _wheelBaseImage.sprite = config.baseSprite;
             _indicatorImage.sprite = config.indicatorSprite;
-
             for (int i = 0; i < _slotViews.Length; i++)
                 _slotViews[i].Setup(rewardSet.rewards[i], _zoneManager.CurrentZone, _gameConfig.goldZoneInterval);
         }
 
-        private void StartIdleAnimation()
-        {
-            _wheelContent.DORotate(new Vector3(0f, 0f, -360f), _idleRotationDuration, RotateMode.FastBeyond360)
-                .SetRelative()
-                .SetEase(Ease.Linear)
-                .SetLoops(-1, LoopType.Incremental);
-
-            _wheelContent.DOScale(Vector3.one * _idleBreatheScale, _idleBreatheDuration)
-                .SetEase(Ease.InOutSine)
-                .SetLoops(-1, LoopType.Yoyo);
-        }
+        #endregion
     }
 }

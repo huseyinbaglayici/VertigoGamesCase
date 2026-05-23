@@ -10,16 +10,10 @@ namespace Runtime.UI
     {
         [SerializeField] private float _countDuration = 0.5f;
 
-        private Image _icon;
-        private TextMeshProUGUI _amountText;
+        [SerializeField] private Image _icon;
+        [SerializeField] private TextMeshProUGUI _amountText;
         private int _displayedAmount;
         private Tween _countTween;
-
-        private void Awake()
-        {
-            _icon = GetComponentInChildren<Image>();
-            _amountText = GetComponentInChildren<TextMeshProUGUI>();
-        }
 
         public void Init(ItemData item)
         {

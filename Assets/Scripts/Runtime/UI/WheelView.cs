@@ -15,23 +15,21 @@ namespace Runtime.UI
         [SerializeField] private Image _indicatorImage;
         [SerializeField] private Button _spinButton;
         [SerializeField] private WheelSlotView[] _slotViews;
-        [SerializeField] private GameObject _cellPrefab;
 
-        [Header("Idle")]
-        [SerializeField] private float _idleRotationDuration = 20f;
+        [Header("Idle")] [SerializeField] private float _idleRotationDuration = 20f;
         [SerializeField] private float _idleBreatheDuration = 2f;
         [SerializeField] private float _idleBreatheScale = 1.02f;
 
-        [Header("Intro")]
-        [SerializeField] private float _introPunchScale = 0.3f;
+        [Header("Intro")] [SerializeField] private float _introPunchScale = 0.3f;
         [SerializeField] private float _introPunchDuration = 0.5f;
         [SerializeField] private int _introPunchVibrato = 5;
         [SerializeField] private float _introPunchElasticity = 0.5f;
 
-        [Header("Spin")]
-        [SerializeField] private float _spinDuration = 3f;
+        [Header("Spin")] [SerializeField] private float _spinDuration = 3f;
         [SerializeField] private int _spinFullRotations = 5;
+
         [SerializeField] private Ease _spinEase = Ease.InOutCubic;
+
         // Indicator position in standard math degrees (CCW from +X). 90 = top (+Y).
         [SerializeField] private float _indicatorAngle = 90f;
 
@@ -63,9 +61,11 @@ namespace Runtime.UI
             _spinManager.OnSpinDecision += HandleSpinDecision;
             _spinManager.OnGameResumed += HandleGameResumed;
             _zoneManager.OnGameCompleted += HandleGameCompleted;
-            InitSlots();
+            yield return null;
+            RefreshSlotData();
             yield return new WaitForEndOfFrame();
-            _wheelContent.DOPunchScale(Vector3.one * _introPunchScale, _introPunchDuration, _introPunchVibrato, _introPunchElasticity)
+            _wheelContent.DOPunchScale(Vector3.one * _introPunchScale, _introPunchDuration, _introPunchVibrato,
+                    _introPunchElasticity)
                 .OnComplete(StartIdleAnimation);
         }
 
@@ -77,6 +77,7 @@ namespace Runtime.UI
                 _spinManager.OnSpinDecision -= HandleSpinDecision;
                 _spinManager.OnGameResumed -= HandleGameResumed;
             }
+
             if (_zoneManager != null)
                 _zoneManager.OnGameCompleted -= HandleGameCompleted;
             _wheelContent.DOKill();
@@ -143,14 +144,6 @@ namespace Runtime.UI
         {
             Vector2 localPos = _slotViews[slotIndex].transform.localPosition;
             return Mathf.Atan2(localPos.y, localPos.x) * Mathf.Rad2Deg;
-        }
-
-        private void InitSlots()
-        {
-            for (int i = 0; i < _slotViews.Length; i++)
-                _slotViews[i].Init(_cellPrefab);
-
-            RefreshSlotData();
         }
 
         private void RefreshSlotData()

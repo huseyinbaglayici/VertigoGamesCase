@@ -14,12 +14,16 @@ namespace Runtime.UI
         [SerializeField] private GameObject _itemPrefab;
         [SerializeField] private Button _exitButton;
 
+        private const string ExitButtonName = "ui_button_inventory_exit";
+
         private IInventoryManager _inventoryManager;
 
         private void OnValidate()
         {
-            var buttons = GetComponentsInChildren<Button>(true);
-            if (buttons.Length == 1) _exitButton = buttons[0];
+            if (_exitButton != null) return;
+            foreach (var button in GetComponentsInChildren<Button>(true))
+                if (button.gameObject.name == ExitButtonName)
+                { _exitButton = button; break; }
         }
         private ISpinManager _spinManager;
         private readonly Dictionary<SO_ItemConfig, InventoryItemView> _itemViews = new();

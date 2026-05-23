@@ -4,7 +4,6 @@ using DG.Tweening;
 using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
 using UnityEngine;
-using UnityEngine.UI;
 using Zenject;
 
 namespace Runtime.UI
@@ -26,14 +25,6 @@ namespace Runtime.UI
         private SO_GameConfig _gameConfig;
 
         private readonly List<StageItemView> _stageItems = new();
-        private float _stageWidth;
-        private float _spacing;
-
-        private void Awake()
-        {
-            _stageWidth = _stagePrefab.GetComponent<RectTransform>().rect.width;
-            _spacing = _stagesContent.GetComponent<HorizontalLayoutGroup>().spacing;
-        }
 
         [Inject]
         public void Construct(IZoneManager zoneManager, ISpinManager spinManager, SO_GameConfig gameConfig)
@@ -97,7 +88,7 @@ namespace Runtime.UI
 
         private void SlideToZone(int zone)
         {
-            float targetX = -((zone - 1) * (_stageWidth + _spacing)) - (_stageWidth / 2f);
+            float targetX = -_stageItems[zone - 1].transform.localPosition.x;
             _stagesContent.DOAnchorPosX(targetX, _slideDuration).SetEase(Ease.OutCubic);
         }
 

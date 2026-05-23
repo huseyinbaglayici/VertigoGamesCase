@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Runtime.Interfaces;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,16 +12,21 @@ namespace Runtime.UI
         [SerializeField] private Transform _content;
         [SerializeField] private RewardItemView _itemPrefab;
         [SerializeField] private Button _collectButton;
+        [SerializeField] private float _itemAnimDuration = 0.3f;
+        [SerializeField] private float _itemAnimInterval = 0.08f;
 
         private IInventoryManager _inventoryManager;
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
 
+        private const string CollectButtonName = "ui_button_reward_exit";
+
         private void OnValidate()
         {
             if (_collectButton != null) return;
-            var buttons = GetComponentsInChildren<Button>(true);
-            if (buttons.Length > 0) _collectButton = buttons[0];
+            foreach (var button in GetComponentsInChildren<Button>(true))
+                if (button.gameObject.name == CollectButtonName)
+                { _collectButton = button; break; }
         }
 
         [Inject]
@@ -47,13 +53,19 @@ namespace Runtime.UI
             foreach (Transform child in _content)
                 Destroy(child.gameObject);
 
+            gameObject.SetActive(true);
+
+            int index = 0;
             foreach (var item in _inventoryManager.GetItems())
             {
                 var view = Instantiate(_itemPrefab, _content);
                 view.Init(item);
+                view.transform.localScale = Vector3.zero;
+                view.transform.DOScale(Vector3.one, _itemAnimDuration)
+                    .SetDelay(index * _itemAnimInterval)
+                    .SetEase(Ease.OutBack);
+                index++;
             }
-
-            gameObject.SetActive(true);
         }
 
         private void OnCollectClicked() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

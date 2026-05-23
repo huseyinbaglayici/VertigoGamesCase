@@ -187,6 +187,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _countDuration: 0.5
+  _icon: {fileID: 2225662304803988565}
+  _amountText: {fileID: 2225662304098629831}
 --- !u!1 &2225662304803988567
 GameObject:
   m_ObjectHideFlags: 0

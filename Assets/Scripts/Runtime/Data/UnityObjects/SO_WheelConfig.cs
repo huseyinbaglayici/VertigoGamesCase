@@ -9,18 +9,4 @@ namespace Runtime.Data.UnityObjects
         public Sprite indicatorSprite;
         public RewardSet[] rewardSets;
     }
-
-    [System.Serializable]
-    public class RewardSet
-    {
-        public RewardEntry[] rewards;
-    }
-
-    [System.Serializable]
-    public class RewardEntry
-    {
-        public SO_ItemConfig item;
-        public int minAmount;
-        public int maxAmount;
-    }
 }

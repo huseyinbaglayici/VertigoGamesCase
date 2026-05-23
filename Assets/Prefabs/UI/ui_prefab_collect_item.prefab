@@ -341,6 +341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _icon: {fileID: 2058713754963677849}
+  _nameText: {fileID: 2058713755566467467}
   _amountText: {fileID: 2058713756183717671}
 --- !u!1 &2058713756183717669
 GameObject:

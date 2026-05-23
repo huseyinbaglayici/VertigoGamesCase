@@ -7,14 +7,21 @@ namespace Runtime.UI
 {
     public class WheelSlotView : MonoBehaviour
     {
+        [SerializeField] private WheelCellView _cell;
+
         private Image _iconImage;
         private TextMeshProUGUI _amountText;
 
-        public void Init(GameObject cellPrefab)
+        private void OnValidate()
         {
-            var cell = Instantiate(cellPrefab, transform);
-            _iconImage = cell.GetComponentInChildren<Image>();
-            _amountText = cell.GetComponentInChildren<TextMeshProUGUI>();
+            if (_cell == null)
+                _cell = GetComponentInChildren<WheelCellView>();
+        }
+
+        private void Awake()
+        {
+            _iconImage = _cell.Icon;
+            _amountText = _cell.AmountText;
         }
 
         public void Setup(RewardEntry entry, int currentZone, int totalZones)

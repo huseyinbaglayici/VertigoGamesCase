@@ -29,7 +29,7 @@ namespace Runtime.UI
         private SignalBus _signalBus;
         private int _continueCost;
 
-        private const string ContinueButtonName = "ui_button_bomb_continue";
+        private const string ContinueButtonName = "ui_button_bomb_revive";
         private const string ExitButtonName = "ui_button_bomb_exit";
 
         private void OnValidate()

@@ -7,6 +7,7 @@ namespace Runtime.Data.UnityObjects
     {
         public int silverZoneInterval = 5;
         public int goldZoneInterval = 30;
+        public int continueCost = 500;
         public SO_WheelConfig normalWheel;
         public SO_WheelConfig silverWheel;
         public SO_WheelConfig goldWheel;

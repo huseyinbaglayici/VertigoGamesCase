@@ -13,6 +13,7 @@ namespace Runtime.Installers
         [SerializeField] private RewardView _rewardView;
         [SerializeField] private StageBarView _stageBarView;
         [SerializeField] private RewardEffectView _rewardEffectView;
+        [SerializeField] private CurrencyHudView _currencyHudView;
 
         public override void InstallBindings()
         {
@@ -23,6 +24,7 @@ namespace Runtime.Installers
             Container.BindInstance(_rewardView).AsSingle();
             Container.BindInstance(_stageBarView).AsSingle();
             Container.BindInstance(_rewardEffectView).AsSingle().NonLazy();
+            Container.BindInstance(_currencyHudView).AsSingle();
         }
     }
 }

@@ -15,3 +15,4 @@ MonoBehaviour:
   itemName: Gold
   icon: {fileID: 21300000, guid: 268aca10824211a47a3c0e323575af49, type: 3}
   isBomb: 0
+  isCurrency: 1

@@ -1,6 +1,8 @@
 using DG.Tweening;
+using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
 using Runtime.Signals;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -13,13 +15,17 @@ namespace Runtime.UI
         [SerializeField] private Button _exitButton;
         [SerializeField] private RectTransform _content;
 
+        private TextMeshProUGUI _continueButtonText;
+
         [Header("Show Animation")]
         [SerializeField] private float _showDuration = 0.4f;
         [SerializeField] private Ease _showEase = Ease.OutBack;
 
         private ISpinManager _spinManager;
+        private ICurrencyManager _currencyManager;
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
+        private int _continueCost;
 
         private const string ContinueButtonName = "ui_button_bomb_continue";
         private const string ExitButtonName = "ui_button_bomb_exit";
@@ -28,18 +34,26 @@ namespace Runtime.UI
         {
             foreach (var button in GetComponentsInChildren<Button>(true))
             {
-                if (button.gameObject.name == ContinueButtonName) _continueButton = button;
+                if (button.gameObject.name == ContinueButtonName)
+                {
+                    _continueButton = button;
+                    _continueButtonText = button.GetComponentInChildren<TextMeshProUGUI>();
+                }
                 if (button.gameObject.name == ExitButtonName) _exitButton = button;
             }
         }
 
         [Inject]
-        public void Construct(ISpinManager spinManager, SceneTransitionView transition, SignalBus signalBus)
+        public void Construct(ISpinManager spinManager, ICurrencyManager currencyManager,
+            SO_GameConfig gameConfig, SceneTransitionView transition, SignalBus signalBus)
         {
             _spinManager = spinManager;
+            _currencyManager = currencyManager;
             _transition = transition;
             _signalBus = signalBus;
+            _continueCost = gameConfig.continueCost;
             _spinManager.OnBombHit += Show;
+            _currencyManager.OnCurrencyChanged += RefreshContinueButton;
             _signalBus.Subscribe<GameRestartSignal>(HandleReset);
             _continueButton.onClick.AddListener(OnContinueClicked);
             _exitButton.onClick.AddListener(OnRestartClicked);
@@ -48,6 +62,7 @@ namespace Runtime.UI
         private void OnDestroy()
         {
             if (_spinManager != null) _spinManager.OnBombHit -= Show;
+            if (_currencyManager != null) _currencyManager.OnCurrencyChanged -= RefreshContinueButton;
             if (_signalBus != null) _signalBus.Unsubscribe<GameRestartSignal>(HandleReset);
             _continueButton.onClick.RemoveListener(OnContinueClicked);
             _exitButton.onClick.RemoveListener(OnRestartClicked);
@@ -56,6 +71,9 @@ namespace Runtime.UI
 
         private void Show()
         {
+            if (_continueButtonText != null)
+                _continueButtonText.text = $"Continue ({_continueCost:N0})";
+            RefreshContinueButton(_currencyManager.Currency);
             gameObject.SetActive(true);
             _content.localScale = Vector3.zero;
             _content.DOScale(Vector3.one, _showDuration).SetEase(_showEase);
@@ -79,7 +97,16 @@ namespace Runtime.UI
             gameObject.SetActive(false);
         }
 
-        private void OnContinueClicked() => Hide();
+        private void RefreshContinueButton(int currency)
+        {
+            _continueButton.interactable = currency >= _continueCost;
+        }
+
+        private void OnContinueClicked()
+        {
+            if (!_currencyManager.TrySpend(_continueCost)) return;
+            Hide();
+        }
 
         private void OnRestartClicked() => _transition.FadeAndReset(() => _signalBus.Fire<GameRestartSignal>());
     }

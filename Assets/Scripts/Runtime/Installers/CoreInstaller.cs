@@ -12,6 +12,7 @@ namespace Runtime.Installers
             Container.BindInterfacesAndSelfTo<ZoneManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<SpinManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<InventoryManager>().AsSingle();
+            Container.BindInterfacesAndSelfTo<CurrencyManager>().AsSingle();
         }
     }
 }

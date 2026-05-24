@@ -16,6 +16,7 @@ namespace Runtime.UI
         [SerializeField] private float _itemAnimInterval = 0.08f;
 
         private IInventoryManager _inventoryManager;
+        private ICurrencyManager _currencyManager;
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
         private SceneTransitionView _transition;
@@ -32,10 +33,12 @@ namespace Runtime.UI
         }
 
         [Inject]
-        public void Construct(IInventoryManager inventoryManager, ISpinManager spinManager, IZoneManager zoneManager,
+        public void Construct(IInventoryManager inventoryManager, ICurrencyManager currencyManager,
+            ISpinManager spinManager, IZoneManager zoneManager,
             SceneTransitionView transition, SignalBus signalBus)
         {
             _inventoryManager = inventoryManager;
+            _currencyManager = currencyManager;
             _spinManager = spinManager;
             _zoneManager = zoneManager;
             _transition = transition;
@@ -80,6 +83,14 @@ namespace Runtime.UI
             gameObject.SetActive(false);
         }
 
-        private void OnCollectClicked() => _transition.FadeAndReset(() => _signalBus.Fire<GameRestartSignal>());
+        private void OnCollectClicked()
+        {
+            int total = 0;
+            foreach (var item in _inventoryManager.GetItems())
+                if (item.Config.isCurrency) total += item.Amount;
+            if (total > 0) _currencyManager.Collect(total);
+
+            _transition.FadeAndReset(() => _signalBus.Fire<GameRestartSignal>());
+        }
     }
 }

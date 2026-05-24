@@ -1,9 +1,10 @@
 using UnityEngine;
+using Zenject;
 
 namespace Runtime.Data.UnityObjects
 {
     [CreateAssetMenu(fileName = "AudioConfig", menuName = "Game/Audio Config")]
-    public class SO_AudioConfig : ScriptableObject
+    public class SO_AudioConfig : ScriptableObjectInstaller
     {
         public AudioClip spinClip;
         public AudioClip spinTickClip;
@@ -13,5 +14,10 @@ namespace Runtime.Data.UnityObjects
         public AudioClip takeRewardClip;
         public AudioClip collectRewardsClip;
         public AudioClip itemPopClip;
+
+        public override void InstallBindings()
+        {
+            Container.BindInstance(this).AsSingle();
+        }
     }
 }

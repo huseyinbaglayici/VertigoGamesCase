@@ -22,21 +22,12 @@ namespace Runtime.UI
         [SerializeField] private Button _spinButton;
         [SerializeField] private WheelSlotView[] _slotViews;
 
-        private const float IdleRotationDuration = 40f;
-        private const float IntroDuration        = 0.5f;
-        private const float SpinDuration         = 4f;
-        private const int   SpinExtraRotations   = 2;
-        private const float IndicatorAngle       = 90f;
-
-        private static readonly AnimationCurve SpinCurve = new AnimationCurve(
-            new Keyframe(0f,   0f,    0f,   0.04f),
-            new Keyframe(0.4f, 0.55f, 1.8f, 1.8f),
-            new Keyframe(1f,   1f,    0f,   0f)
-        );
+        private const float IndicatorAngle = 90f;
 
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
         private SO_GameConfig _gameConfig;
+        private SO_WheelAnimationConfig _animCfg;
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
         private AudioService _audioService;
@@ -50,11 +41,12 @@ namespace Runtime.UI
 
         [Inject]
         public void Construct(ISpinManager spinManager, IZoneManager zoneManager, SO_GameConfig gameConfig,
-            SceneTransitionView transition, SignalBus signalBus, AudioService audioService)
+            SO_WheelAnimationConfig animConfig, SceneTransitionView transition, SignalBus signalBus, AudioService audioService)
         {
             _spinManager = spinManager;
             _zoneManager = zoneManager;
             _gameConfig = gameConfig;
+            _animCfg = animConfig;
             _transition = transition;
             _signalBus = signalBus;
             _audioService = audioService;
@@ -126,9 +118,9 @@ namespace Runtime.UI
             bool isBomb = result.item.isBomb;
             _hapticCoroutine = StartCoroutine(SpinHapticCoroutine());
 
-            _wheelContent.DORotate(new Vector3(0f, 0f, -ComputeCwDistance(slotIndex)), SpinDuration, RotateMode.FastBeyond360)
+            _wheelContent.DORotate(new Vector3(0f, 0f, -ComputeCwDistance(slotIndex)), _animCfg.spinDuration, RotateMode.FastBeyond360)
                 .SetRelative()
-                .SetEase(SpinCurve)
+                .SetEase(_animCfg.spinCurve)
                 .OnComplete(() =>
                 {
                     if (_hapticCoroutine != null) { StopCoroutine(_hapticCoroutine); _hapticCoroutine = null; }
@@ -193,7 +185,7 @@ namespace Runtime.UI
             float targetZ = ((IndicatorAngle - slotAngle) % 360f + 360f) % 360f;
             float cwDistance = _wheelContent.eulerAngles.z - targetZ;
             if (cwDistance < 10f) cwDistance += 360f;
-            return cwDistance + SpinExtraRotations * 360f;
+            return cwDistance + _animCfg.spinExtraRotations * 360f;
         }
 
         #endregion
@@ -204,8 +196,8 @@ namespace Runtime.UI
         {
             _transition.OnOpened -= PlayIntro;
             transform.localScale = Vector3.zero;
-            transform.DOScale(Vector3.one, IntroDuration)
-                .SetEase(Ease.OutBack)
+            transform.DOScale(Vector3.one, _animCfg.introDuration)
+                .SetEase(_animCfg.introEase)
                 .OnComplete(StartIdleAnimation);
         }
 
@@ -219,7 +211,7 @@ namespace Runtime.UI
         private void StartIdleAnimation()
         {
             if (_isSpinning) return;
-            _wheelContent.DORotate(new Vector3(0f, 0f, -360f), IdleRotationDuration, RotateMode.FastBeyond360)
+            _wheelContent.DORotate(new Vector3(0f, 0f, -360f), _animCfg.idleRotationDuration, RotateMode.FastBeyond360)
                 .SetRelative()
                 .SetEase(Ease.Linear)
                 .SetLoops(-1, LoopType.Incremental);

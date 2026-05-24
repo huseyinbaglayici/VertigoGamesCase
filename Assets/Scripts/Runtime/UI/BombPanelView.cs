@@ -18,8 +18,9 @@ namespace Runtime.UI
 
         private TextMeshProUGUI _continueButtonText;
 
-        [Header("Show Animation")]
-        [SerializeField] private float _showDuration = 0.4f;
+        [Header("Show Animation")] [SerializeField]
+        private float _showDuration = 0.4f;
+
         [SerializeField] private Ease _showEase = Ease.OutBack;
 
         private ISpinManager _spinManager;
@@ -41,6 +42,7 @@ namespace Runtime.UI
                     _continueButton = button;
                     _continueButtonText = button.GetComponentInChildren<TextMeshProUGUI>();
                 }
+
                 if (button.gameObject.name == ExitButtonName) _exitButton = button;
             }
         }
@@ -76,7 +78,7 @@ namespace Runtime.UI
         private void Show()
         {
             if (_continueButtonText != null)
-                _continueButtonText.text = $"Continue ({_continueCost:N0})";
+                _continueButtonText.text = _continueCost.ToString();
             RefreshContinueButton(_currencyManager.Currency);
             gameObject.SetActive(true);
             _content.localScale = Vector3.zero;

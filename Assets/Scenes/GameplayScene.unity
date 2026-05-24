@@ -1543,15 +1543,6 @@ MonoBehaviour:
   - {fileID: 1962191943}
   - {fileID: 641757732}
   - {fileID: 1388275926}
-  _spreadRadius: 30
-  _scatterDuration: 0.1
-  _scatterEase: 27
-  _jumpHeight: 90
-  _jumpDuration: 0.1
-  _scrollDuration: 0.15
-  _flyDuration: 0.15
-  _flyStagger: 0.05
-  _flyEase: 5
 --- !u!1 &377118149
 GameObject:
   m_ObjectHideFlags: 0
@@ -3535,7 +3526,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 89715ad69b973a14899afa2c6730b30b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _scriptableObjectInstallers: []
+  _scriptableObjectInstallers:
+  - {fileID: 11400000, guid: 2dea100e077e56c4099b2ef0c45c3fa9, type: 2}
+  - {fileID: 11400000, guid: 1d9ab7fb403a1214d87aab9f64b91640, type: 2}
+  - {fileID: 11400000, guid: 24f66a71c9448aa4c9755b1da7975f78, type: 2}
+  - {fileID: 11400000, guid: d7df19df3e18c8b40b21e4d7bc943fcc, type: 2}
   _monoInstallers:
   - {fileID: 1755899980}
   - {fileID: 2127566657}
@@ -5925,8 +5920,6 @@ MonoBehaviour:
   _content: {fileID: 1095836785}
   _itemPrefab: {fileID: 8523248516871119217, guid: 8c1516b5ef69d2c4c859f821d6a76ad5, type: 3}
   _collectButton: {fileID: 472998851}
-  _itemAnimDuration: 0.3
-  _itemAnimInterval: 0.08
 --- !u!1 &1755899978
 GameObject:
   m_ObjectHideFlags: 0
@@ -5971,8 +5964,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec48988ea1654027a5892083972b6179, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameConfig: {fileID: 11400000, guid: 2dea100e077e56c4099b2ef0c45c3fa9, type: 2}
-  audioConfig: {fileID: 11400000, guid: 1d9ab7fb403a1214d87aab9f64b91640, type: 2}
 --- !u!1 &1769833850
 GameObject:
   m_ObjectHideFlags: 0

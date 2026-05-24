@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
 using TMPro;
 using UnityEngine;
@@ -12,14 +13,13 @@ namespace Runtime.UI
         [SerializeField] private TextMeshProUGUI _nameText;
         [SerializeField] private TextMeshProUGUI _amountText;
 
-        [Header("Spread Effect")]
         [SerializeField] private Image[] _particles;
-        [SerializeField] private float _spreadRadius   = 24f;
-        [SerializeField] private float _spreadDuration = 0.15f;
-        [SerializeField] private float _gatherDuration = 0.12f;
 
-        public void Init(ItemData item)
+        private SO_RewardAnimationConfig.ItemSpreadBurst _cfg;
+
+        public void Init(ItemData item, SO_RewardAnimationConfig.ItemSpreadBurst cfg)
         {
+            _cfg = cfg;
             _icon.sprite = item.Config.icon;
             _nameText.text = item.Config.itemName;
             _amountText.text = $"x{item.Amount}";
@@ -39,12 +39,12 @@ namespace Runtime.UI
                 particle.gameObject.SetActive(true);
 
                 float angle = i * angleStep * Mathf.Deg2Rad;
-                Vector3 target = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * _spreadRadius;
+                Vector3 target = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0f) * _cfg.spreadRadius;
 
                 t.DOKill();
                 var seq = DOTween.Sequence();
-                seq.Append(t.DOLocalMove(target, _spreadDuration).SetEase(Ease.OutQuad));
-                seq.Append(t.DOLocalMove(Vector3.zero, _gatherDuration).SetEase(Ease.InQuad));
+                seq.Append(t.DOLocalMove(target, _cfg.spreadDuration).SetEase(Ease.OutQuad));
+                seq.Append(t.DOLocalMove(Vector3.zero, _cfg.gatherDuration).SetEase(Ease.InQuad));
                 seq.OnComplete(() => particle.gameObject.SetActive(false));
             }
         }

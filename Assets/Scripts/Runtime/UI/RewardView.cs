@@ -1,5 +1,6 @@
 using DG.Tweening;
 using Runtime.Audio;
+using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
 using Runtime.Signals;
 using Runtime.Utility;
@@ -14,8 +15,6 @@ namespace Runtime.UI
         [SerializeField] private Transform _content;
         [SerializeField] private RewardItemView _itemPrefab;
         [SerializeField] private Button _collectButton;
-        [SerializeField] private float _itemAnimDuration = 0.3f;
-        [SerializeField] private float _itemAnimInterval = 0.08f;
 
         private IInventoryManager _inventoryManager;
         private ICurrencyManager _currencyManager;
@@ -24,6 +23,8 @@ namespace Runtime.UI
         private AudioService _audioService;
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
+        private SO_RewardAnimationConfig.ItemPopIn    _cfg;
+        private SO_RewardAnimationConfig.ItemSpreadBurst _itemCfg;
 
         private const string CollectButtonName = "ui_button_reward_exit";
 
@@ -37,8 +38,8 @@ namespace Runtime.UI
 
         [Inject]
         public void Construct(IInventoryManager inventoryManager, ICurrencyManager currencyManager,
-            ISpinManager spinManager, IZoneManager zoneManager,
-            AudioService audioService, SceneTransitionView transition, SignalBus signalBus)
+            ISpinManager spinManager, IZoneManager zoneManager, AudioService audioService,
+            SceneTransitionView transition, SignalBus signalBus, SO_RewardAnimationConfig animConfig)
         {
             _inventoryManager = inventoryManager;
             _currencyManager = currencyManager;
@@ -47,6 +48,8 @@ namespace Runtime.UI
             _audioService = audioService;
             _transition = transition;
             _signalBus = signalBus;
+            _cfg = animConfig.itemPopIn;
+            _itemCfg = animConfig.itemSpreadBurst;
             _spinManager.OnRewardsRequested += Show;
             _zoneManager.OnGameCompleted += Show;
             _signalBus.Subscribe<GameRestartSignal>(HandleReset);
@@ -72,11 +75,11 @@ namespace Runtime.UI
             foreach (var item in _inventoryManager.GetItems())
             {
                 var view = Instantiate(_itemPrefab, _content);
-                view.Init(item);
+                view.Init(item, _itemCfg);
                 view.transform.localScale = Vector3.zero;
-                view.transform.DOScale(Vector3.one, _itemAnimDuration)
-                    .SetDelay(index * _itemAnimInterval)
-                    .SetEase(Ease.OutBack)
+                view.transform.DOScale(Vector3.one, _cfg.duration)
+                    .SetDelay(index * _cfg.interval)
+                    .SetEase(_cfg.ease)
                     .OnStart(() =>
                     {
                         view.PlaySpreadEffect();

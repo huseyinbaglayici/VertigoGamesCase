@@ -11,31 +11,16 @@ namespace Runtime.UI
     {
         [SerializeField] private Image[] _particles;
 
-        [Header("Scatter")]
-        [SerializeField] private float _spreadRadius    = 30f;
-        [SerializeField] private float _scatterDuration = 0.2f;
-        [SerializeField] private Ease  _scatterEase     = Ease.OutBack;
-
-        [Header("Jump")]
-        [SerializeField] private float _jumpHeight   = 60f;
-        [SerializeField] private float _jumpDuration = 0.15f;
-
-        [Header("Scroll")]
-        [SerializeField] private float _scrollDuration = 0.3f;
-
-        [Header("Fly")]
-        [SerializeField] private float _flyDuration = 0.45f;
-        [SerializeField] private float _flyStagger  = 0.05f;
-        [SerializeField] private Ease  _flyEase     = Ease.InQuad;
-
+        private SO_RewardAnimationConfig.ParticleScatterFly _cfg;
         private InventoryView _inventoryView;
         private SignalBus _signalBus;
 
         [Inject]
-        public void Construct(InventoryView inventoryView, SignalBus signalBus)
+        public void Construct(InventoryView inventoryView, SignalBus signalBus, SO_RewardAnimationConfig animConfig)
         {
             _inventoryView = inventoryView;
             _signalBus = signalBus;
+            _cfg = animConfig.particleScatterFly;
             _signalBus.Subscribe<RewardReadyToFlySignal>(OnRewardReadyToFly);
         }
 
@@ -58,18 +43,18 @@ namespace Runtime.UI
             {
                 float angle = i * angleStep * Mathf.Deg2Rad;
                 Vector3 scatterLocal = slotLocal + new Vector3(
-                    Mathf.Cos(angle) * _spreadRadius,
-                    Mathf.Sin(angle) * _spreadRadius, 0f);
+                    Mathf.Cos(angle) * _cfg.spreadRadius,
+                    Mathf.Sin(angle) * _cfg.spreadRadius, 0f);
 
                 _particles[i].transform.DOKill();
                 _particles[i].sprite = entry.item.icon;
                 _particles[i].transform.localPosition = slotLocal;
 
-                _particles[i].transform.DOLocalMove(scatterLocal, _scatterDuration)
-                    .SetEase(_scatterEase);
+                _particles[i].transform.DOLocalMove(scatterLocal, _cfg.scatterDuration)
+                    .SetEase(_cfg.scatterEase);
             }
 
-            _inventoryView.ScrollToItem(entry.item, _scrollDuration, FlyTo);
+            _inventoryView.ScrollToItem(entry.item, _cfg.scrollDuration, FlyTo);
         }
 
         private void FlyTo(Vector3 worldTarget)
@@ -80,11 +65,11 @@ namespace Runtime.UI
             for (int i = 0; i < _particles.Length; i++)
             {
                 var particle = _particles[i];
-                float peakY = particle.transform.localPosition.y + _jumpHeight;
+                float peakY = particle.transform.localPosition.y + _cfg.jumpHeight;
 
-                var seq = DOTween.Sequence().SetDelay(i * _flyStagger);
-                seq.Append(particle.transform.DOLocalMoveY(peakY, _jumpDuration).SetEase(Ease.OutQuad));
-                seq.Append(particle.transform.DOLocalMove(localTarget, _flyDuration).SetEase(_flyEase));
+                var seq = DOTween.Sequence().SetDelay(i * _cfg.flyStagger);
+                seq.Append(particle.transform.DOLocalMoveY(peakY, _cfg.jumpDuration).SetEase(Ease.OutQuad));
+                seq.Append(particle.transform.DOLocalMove(localTarget, _cfg.flyDuration).SetEase(_cfg.flyEase));
                 seq.OnComplete(() =>
                 {
                     flyCompleted++;

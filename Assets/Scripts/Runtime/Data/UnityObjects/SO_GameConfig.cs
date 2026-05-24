@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
+using Zenject;
 
 namespace Runtime.Data.UnityObjects
 {
     [CreateAssetMenu(menuName = "Config/GameConfig")]
-    public class SO_GameConfig : ScriptableObject
+    public class SO_GameConfig : ScriptableObjectInstaller
     {
         public int silverZoneInterval = 5;
         public int goldZoneInterval = 30;
@@ -12,5 +13,10 @@ namespace Runtime.Data.UnityObjects
         public SO_WheelConfig silverWheel;
         public SO_WheelConfig goldWheel;
         public SO_StageConfig stageConfig;
+
+        public override void InstallBindings()
+        {
+            Container.BindInstance(this).AsSingle();
+        }
     }
 }

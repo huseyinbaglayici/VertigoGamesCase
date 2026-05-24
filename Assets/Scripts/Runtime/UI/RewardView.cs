@@ -2,6 +2,7 @@ using DG.Tweening;
 using Runtime.Audio;
 using Runtime.Interfaces;
 using Runtime.Signals;
+using Runtime.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -75,7 +76,13 @@ namespace Runtime.UI
                 view.transform.localScale = Vector3.zero;
                 view.transform.DOScale(Vector3.one, _itemAnimDuration)
                     .SetDelay(index * _itemAnimInterval)
-                    .SetEase(Ease.OutBack);
+                    .SetEase(Ease.OutBack)
+                    .OnStart(() =>
+                    {
+                        view.PlaySpreadEffect();
+                        _audioService.PlayItemPopSfx();
+                        HapticFeedback.Play(HapticFeedback.HapticType.Light);
+                    });
                 index++;
             }
         }

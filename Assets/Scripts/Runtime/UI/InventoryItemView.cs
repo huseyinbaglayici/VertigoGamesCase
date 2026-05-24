@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using Runtime.Data.ValueObjects;
 using TMPro;
@@ -13,6 +14,8 @@ namespace Runtime.UI
         [SerializeField] private Image _icon;
         [SerializeField] private TextMeshProUGUI _amountText;
         private const float SpawnDuration = 0.35f;
+
+        public event Action OnBounced;
 
         private int _displayedAmount;
         private int _targetAmount;
@@ -42,6 +45,7 @@ namespace Runtime.UI
 
         public void AnimateToAmount(int targetAmount)
         {
+            OnBounced?.Invoke();
             _countTween?.Kill();
             _countTween = DOTween.To(
                 () => _displayedAmount,

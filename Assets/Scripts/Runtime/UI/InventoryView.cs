@@ -88,6 +88,7 @@ namespace Runtime.UI
             {
                 var view = Instantiate(_itemPrefab, _content).GetComponent<InventoryItemView>();
                 view.Init(item);
+                view.OnBounced += _audioService.PlayTakeRewardSfx;
                 view.PlaySpawnAnimation();
                 _itemViews[item.Config] = view;
             }

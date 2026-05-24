@@ -26,6 +26,7 @@ namespace Runtime.Audio
         public void PlayGoldRewardSfx() => PlayOneShot(_config.goldRewardClip);
         public void PlayTakeRewardSfx() => PlayOneShot(_config.takeRewardClip);
         public void PlayCollectSfx()    => PlayOneShot(_config.collectRewardsClip);
+        public void PlayItemPopSfx()    => PlayOneShot(_config.itemPopClip);
 
         // PlayMain: main clip slot — Stop() ile durdurulabilir (PlayOneShot'ları etkilemez)
         private void PlayMain(AudioClip clip)

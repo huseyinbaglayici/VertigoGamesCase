@@ -17,5 +17,6 @@ MonoBehaviour:
   rewardClip: {fileID: 8300000, guid: fe5186ce0ca8aae4ab612c73b574c30c, type: 3}
   goldRewardClip: {fileID: 8300000, guid: f509cb519adc78649a2517de844a275e, type: 3}
   bombClip: {fileID: 8300000, guid: bd6036454daa4df4f8e2af4afaf477c9, type: 3}
-  takeRewardClip: {fileID: 8300000, guid: 2bec9217dcb0bef4298501ceb8aa05d9, type: 3}
+  takeRewardClip: {fileID: 8300000, guid: 930b424474f544e44829273428c1e49d, type: 3}
   collectRewardsClip: {fileID: 0}
+  itemPopClip: {fileID: 8300000, guid: 2bec9217dcb0bef4298501ceb8aa05d9, type: 3}

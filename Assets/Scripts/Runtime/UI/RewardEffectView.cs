@@ -1,5 +1,4 @@
 using DG.Tweening;
-using Runtime.Audio;
 using Runtime.Data.UnityObjects;
 using Runtime.Signals;
 using UnityEngine;
@@ -31,14 +30,12 @@ namespace Runtime.UI
 
         private InventoryView _inventoryView;
         private SignalBus _signalBus;
-        private AudioService _audioService;
 
         [Inject]
-        public void Construct(InventoryView inventoryView, SignalBus signalBus, AudioService audioService)
+        public void Construct(InventoryView inventoryView, SignalBus signalBus)
         {
             _inventoryView = inventoryView;
             _signalBus = signalBus;
-            _audioService = audioService;
             _signalBus.Subscribe<RewardReadyToFlySignal>(OnRewardReadyToFly);
         }
 
@@ -53,7 +50,6 @@ namespace Runtime.UI
         private void Play(Transform slotTransform, RewardEntry entry)
         {
             gameObject.SetActive(true);
-            _audioService.PlayTakeRewardSfx();
 
             float angleStep = 360f / _particles.Length;
             Vector3 slotLocal = transform.InverseTransformPoint(slotTransform.position);

@@ -5,13 +5,14 @@ using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
 using Runtime.Signals;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace Runtime.UI
 {
     public class StageBarView : MonoBehaviour
     {
-        [SerializeField] private RectTransform _stagesContent;
+        [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private GameObject _stagePrefab;
         [SerializeField] private float _slideDuration = 0.3f;
         [SerializeField] private float _punchScale = 0.35f;
@@ -75,7 +76,7 @@ namespace Runtime.UI
         {
             for (int i = 1; i <= _gameConfig.goldZoneInterval; i++)
             {
-                var go = Instantiate(_stagePrefab, _stagesContent);
+                var go = Instantiate(_stagePrefab, _scrollRect.content);
                 var view = go.GetComponent<StageItemView>();
                 view.Setup(i, _zoneManager.GetZoneType(i), _gameConfig.stageConfig);
                 _stageItems.Add(view);
@@ -112,8 +113,11 @@ namespace Runtime.UI
 
         private void SlideToZone(int zone)
         {
-            float targetX = -_stageItems[zone - 1].transform.localPosition.x;
-            _stagesContent.DOAnchorPosX(targetX, _slideDuration).SetEase(Ease.OutCubic);
+            Canvas.ForceUpdateCanvases();
+            var itemRect = (RectTransform)_stageItems[zone - 1].transform;
+            float itemLocalX = _scrollRect.content.InverseTransformPoint(itemRect.position).x;
+            float viewportHalfWidth = _scrollRect.viewport.rect.width * 0.5f;
+            _scrollRect.content.DOAnchorPosX(-itemLocalX + viewportHalfWidth, _slideDuration).SetEase(Ease.OutCubic);
         }
 
         private void PunchFrame()

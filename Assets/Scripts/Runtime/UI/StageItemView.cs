@@ -21,8 +21,16 @@ namespace Runtime.UI
         {
             stageText.text = zoneNumber.ToString();
 
-            if (zoneType == ZoneType.Silver) { backgroundImage.sprite = config.silverIcon; backgroundImage.enabled = true; }
-            else if (zoneType == ZoneType.Gold) { backgroundImage.sprite = config.goldIcon; backgroundImage.enabled = true; }
+            if (zoneType == ZoneType.Silver)
+            {
+                backgroundImage.sprite = config.silverIcon;
+                backgroundImage.enabled = true;
+            }
+            else if (zoneType == ZoneType.Gold)
+            {
+                backgroundImage.sprite = config.goldIcon;
+                backgroundImage.enabled = true;
+            }
             else backgroundImage.enabled = false;
         }
 
@@ -53,7 +61,5 @@ namespace Runtime.UI
             _fadeTween?.Kill();
             _activateTween?.Kill();
         }
-
-
     }
 }

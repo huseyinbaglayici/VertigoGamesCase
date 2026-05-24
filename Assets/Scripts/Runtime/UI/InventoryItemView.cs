@@ -29,7 +29,7 @@ namespace Runtime.UI
             _icon.sprite = item.Config.icon;
             _displayedAmount = 0;
             _targetAmount = item.Amount;
-            _amountText.text = "x0";
+            _amountText.text = "0";
         }
 
         public void PlaySpawnAnimation()
@@ -48,7 +48,7 @@ namespace Runtime.UI
                 x =>
                 {
                     _displayedAmount = x;
-                    _amountText.text = $"x{x}";
+                    _amountText.text = $"{x}";
                 },
                 targetAmount,
                 _countDuration

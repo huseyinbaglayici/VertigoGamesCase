@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using Runtime.Audio;
 using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
 using Runtime.Interfaces;
@@ -22,6 +23,7 @@ namespace Runtime.UI
 
         private IInventoryManager _inventoryManager;
         private ISpinManager _spinManager;
+        private AudioService _audioService;
         private SignalBus _signalBus;
         private readonly Dictionary<SO_ItemConfig, InventoryItemView> _itemViews = new();
 
@@ -37,10 +39,12 @@ namespace Runtime.UI
         }
 
         [Inject]
-        public void Construct(IInventoryManager inventoryManager, ISpinManager spinManager, SignalBus signalBus)
+        public void Construct(IInventoryManager inventoryManager, ISpinManager spinManager,
+            AudioService audioService, SignalBus signalBus)
         {
             _inventoryManager = inventoryManager;
             _spinManager = spinManager;
+            _audioService = audioService;
             _signalBus = signalBus;
         }
 
@@ -73,7 +77,10 @@ namespace Runtime.UI
         private void OnSpinEnded(RewardEntry _) => _exitButton.interactable = true;
 
         private void OnSpinResumed() => _exitButton.interactable = true;
-        private void OnExitClicked() => _spinManager.RequestRewards();
+        private void OnExitClicked()
+        {
+            _spinManager.RequestRewards();
+        }
 
         private void HandleItemAdded(ItemData item, bool isNew)
         {

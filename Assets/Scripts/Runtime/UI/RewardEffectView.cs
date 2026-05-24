@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Runtime.Audio;
 using Runtime.Data.UnityObjects;
 using Runtime.Signals;
 using UnityEngine;
@@ -11,22 +12,33 @@ namespace Runtime.UI
     {
         [SerializeField] private Image[] _particles;
 
-        [Header("Spread")] [SerializeField] private float _spreadRadius = 30f;
+        [Header("Scatter")]
+        [SerializeField] private float _spreadRadius    = 30f;
+        [SerializeField] private float _scatterDuration = 0.2f;
+        [SerializeField] private Ease  _scatterEase     = Ease.OutBack;
 
-        [Header("Scroll")] [SerializeField] private float _scrollDuration = 0.3f;
+        [Header("Jump")]
+        [SerializeField] private float _jumpHeight   = 60f;
+        [SerializeField] private float _jumpDuration = 0.15f;
 
-        [Header("Fly")] [SerializeField] private float _flyDuration = 0.45f;
-        [SerializeField] private float _flyStagger = 0.05f;
-        [SerializeField] private Ease _flyEase = Ease.InQuad;
+        [Header("Scroll")]
+        [SerializeField] private float _scrollDuration = 0.3f;
+
+        [Header("Fly")]
+        [SerializeField] private float _flyDuration = 0.45f;
+        [SerializeField] private float _flyStagger  = 0.05f;
+        [SerializeField] private Ease  _flyEase     = Ease.InQuad;
 
         private InventoryView _inventoryView;
         private SignalBus _signalBus;
+        private AudioService _audioService;
 
         [Inject]
-        public void Construct(InventoryView inventoryView, SignalBus signalBus)
+        public void Construct(InventoryView inventoryView, SignalBus signalBus, AudioService audioService)
         {
             _inventoryView = inventoryView;
             _signalBus = signalBus;
+            _audioService = audioService;
             _signalBus.Subscribe<RewardReadyToFlySignal>(OnRewardReadyToFly);
         }
 
@@ -41,18 +53,24 @@ namespace Runtime.UI
         private void Play(Transform slotTransform, RewardEntry entry)
         {
             gameObject.SetActive(true);
+            _audioService.PlayTakeRewardSfx();
 
             float angleStep = 360f / _particles.Length;
+            Vector3 slotLocal = transform.InverseTransformPoint(slotTransform.position);
 
             for (int i = 0; i < _particles.Length; i++)
             {
                 float angle = i * angleStep * Mathf.Deg2Rad;
-                Vector3 worldPos = slotTransform.position +
-                                   (Vector3)(new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * _spreadRadius);
+                Vector3 scatterLocal = slotLocal + new Vector3(
+                    Mathf.Cos(angle) * _spreadRadius,
+                    Mathf.Sin(angle) * _spreadRadius, 0f);
 
                 _particles[i].transform.DOKill();
                 _particles[i].sprite = entry.item.icon;
-                _particles[i].transform.localPosition = transform.InverseTransformPoint(worldPos);
+                _particles[i].transform.localPosition = slotLocal;
+
+                _particles[i].transform.DOLocalMove(scatterLocal, _scatterDuration)
+                    .SetEase(_scatterEase);
             }
 
             _inventoryView.ScrollToItem(entry.item, _scrollDuration, FlyTo);
@@ -66,20 +84,20 @@ namespace Runtime.UI
             for (int i = 0; i < _particles.Length; i++)
             {
                 var particle = _particles[i];
-                float delay = i * _flyStagger;
+                float peakY = particle.transform.localPosition.y + _jumpHeight;
 
-                particle.transform.DOLocalMove(localTarget, _flyDuration)
-                    .SetDelay(delay)
-                    .SetEase(_flyEase)
-                    .OnComplete(() =>
-                    {
-                        flyCompleted++;
-                        if (flyCompleted < _particles.Length) return;
-                        foreach (var p in _particles)
-                            p.transform.localPosition = Vector3.zero;
-                        _signalBus.Fire<RewardFlyCompleteSignal>();
-                        gameObject.SetActive(false);
-                    });
+                var seq = DOTween.Sequence().SetDelay(i * _flyStagger);
+                seq.Append(particle.transform.DOLocalMoveY(peakY, _jumpDuration).SetEase(Ease.OutQuad));
+                seq.Append(particle.transform.DOLocalMove(localTarget, _flyDuration).SetEase(_flyEase));
+                seq.OnComplete(() =>
+                {
+                    flyCompleted++;
+                    if (flyCompleted < _particles.Length) return;
+                    foreach (var p in _particles)
+                        p.transform.localPosition = Vector3.zero;
+                    _signalBus.Fire<RewardFlyCompleteSignal>();
+                    gameObject.SetActive(false);
+                });
             }
         }
     }

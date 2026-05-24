@@ -11,6 +11,6 @@ namespace Runtime.Data.UnityObjects
         public AudioClip goldRewardClip;
         public AudioClip bombClip;
         public AudioClip takeRewardClip;
-        public AudioClip collectClip;
+        public AudioClip collectRewardsClip;
     }
 }

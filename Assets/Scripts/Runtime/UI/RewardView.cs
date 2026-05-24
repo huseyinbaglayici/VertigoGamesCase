@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Runtime.Audio;
 using Runtime.Interfaces;
 using Runtime.Signals;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace Runtime.UI
         private ICurrencyManager _currencyManager;
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
+        private AudioService _audioService;
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
 
@@ -35,12 +37,13 @@ namespace Runtime.UI
         [Inject]
         public void Construct(IInventoryManager inventoryManager, ICurrencyManager currencyManager,
             ISpinManager spinManager, IZoneManager zoneManager,
-            SceneTransitionView transition, SignalBus signalBus)
+            AudioService audioService, SceneTransitionView transition, SignalBus signalBus)
         {
             _inventoryManager = inventoryManager;
             _currencyManager = currencyManager;
             _spinManager = spinManager;
             _zoneManager = zoneManager;
+            _audioService = audioService;
             _transition = transition;
             _signalBus = signalBus;
             _spinManager.OnRewardsRequested += Show;
@@ -90,7 +93,7 @@ namespace Runtime.UI
                 if (item.Config.isCurrency) total += item.Amount;
             if (total > 0) _currencyManager.Collect(total);
 
-            _signalBus.Fire<RewardCollectedSignal>();
+            _audioService.PlayCollectSfx();
             _transition.FadeAndReset(() => _signalBus.Fire<GameRestartSignal>());
         }
     }

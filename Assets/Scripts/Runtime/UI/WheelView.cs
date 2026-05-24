@@ -2,6 +2,7 @@ using System.Collections;
 using DG.Tweening;
 using Runtime.Audio;
 using Runtime.Data.UnityObjects;
+using Runtime.Enums;
 using Runtime.Interfaces;
 using Runtime.Signals;
 using Runtime.Utility;
@@ -22,16 +23,15 @@ namespace Runtime.UI
         [SerializeField] private WheelSlotView[] _slotViews;
 
         private const float IdleRotationDuration = 40f;
-        private const float IntroDuration = 0.5f;
-        private const float SpinDuration = 3f;
-        private const int SpinFullRotations = 5;
-        private const float IndicatorAngle = 90f;
+        private const float IntroDuration        = 0.5f;
+        private const float SpinDuration         = 4f;
+        private const int   SpinExtraRotations   = 2;
+        private const float IndicatorAngle       = 90f;
 
-        // Non-zero initial slope keeps wheel above idle speed at spin start — prevents perceived pause.
         private static readonly AnimationCurve SpinCurve = new AnimationCurve(
-            new Keyframe(0f,    0f,   0f,   0.1f),
-            new Keyframe(0.35f, 0.5f, 3.0f, 3.0f),
-            new Keyframe(1f,    1f,   0f,   0f)
+            new Keyframe(0f,   0f,    0f,   0.04f),
+            new Keyframe(0.4f, 0.55f, 1.8f, 1.8f),
+            new Keyframe(1f,   1f,    0f,   0f)
         );
 
         private ISpinManager _spinManager;
@@ -132,10 +132,23 @@ namespace Runtime.UI
                 .OnComplete(() =>
                 {
                     if (_hapticCoroutine != null) { StopCoroutine(_hapticCoroutine); _hapticCoroutine = null; }
+
                     HapticFeedback.Play(isBomb
                         ? HapticFeedback.HapticType.Heavy
                         : HapticFeedback.HapticType.Medium);
-                    if (isBomb) _slotViews[slotIndex].SetSafe();
+
+                    if (isBomb)
+                    {
+                        _audioService.PlayBombSfx();
+                        _slotViews[slotIndex].SetSafe();
+                    }
+                    else
+                    {
+                        bool isGold = _zoneManager.GetZoneType(_zoneManager.CurrentZone) == ZoneType.Gold;
+                        if (isGold) _audioService.PlayGoldRewardSfx();
+                        else _audioService.PlayRewardSfx();
+                    }
+
                     _spinManager.CommitSpinResult();
                     if (isBomb || _gameCompleted) return;
 
@@ -180,7 +193,7 @@ namespace Runtime.UI
             float targetZ = ((IndicatorAngle - slotAngle) % 360f + 360f) % 360f;
             float cwDistance = _wheelContent.eulerAngles.z - targetZ;
             if (cwDistance < 10f) cwDistance += 360f;
-            return cwDistance + SpinFullRotations * 360f;
+            return cwDistance + SpinExtraRotations * 360f;
         }
 
         #endregion
@@ -206,7 +219,6 @@ namespace Runtime.UI
         private void StartIdleAnimation()
         {
             if (_isSpinning) return;
-            _wheelContent.localEulerAngles = Vector3.zero;
             _wheelContent.DORotate(new Vector3(0f, 0f, -360f), IdleRotationDuration, RotateMode.FastBeyond360)
                 .SetRelative()
                 .SetEase(Ease.Linear)

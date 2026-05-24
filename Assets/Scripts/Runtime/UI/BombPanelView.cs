@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Runtime.Audio;
 using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
 using Runtime.Signals;
@@ -23,6 +24,7 @@ namespace Runtime.UI
 
         private ISpinManager _spinManager;
         private ICurrencyManager _currencyManager;
+        private AudioService _audioService;
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
         private int _continueCost;
@@ -45,10 +47,12 @@ namespace Runtime.UI
 
         [Inject]
         public void Construct(ISpinManager spinManager, ICurrencyManager currencyManager,
-            SO_GameConfig gameConfig, SceneTransitionView transition, SignalBus signalBus)
+            SO_GameConfig gameConfig, SceneTransitionView transition, SignalBus signalBus,
+            AudioService audioService)
         {
             _spinManager = spinManager;
             _currencyManager = currencyManager;
+            _audioService = audioService;
             _transition = transition;
             _signalBus = signalBus;
             _continueCost = gameConfig.continueCost;
@@ -85,6 +89,7 @@ namespace Runtime.UI
                 .SetEase(Ease.InBack)
                 .OnComplete(() =>
                 {
+                    _audioService.StopBombSfx();
                     gameObject.SetActive(false);
                     _spinManager.Continue();
                 });
@@ -108,6 +113,10 @@ namespace Runtime.UI
             Hide();
         }
 
-        private void OnRestartClicked() => _transition.FadeAndReset(() => _signalBus.Fire<GameRestartSignal>());
+        private void OnRestartClicked()
+        {
+            _audioService.StopBombSfx();
+            _transition.FadeAndReset(() => _signalBus.Fire<GameRestartSignal>());
+        }
     }
 }

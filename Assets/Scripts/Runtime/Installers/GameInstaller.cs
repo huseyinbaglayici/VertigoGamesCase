@@ -18,7 +18,6 @@ namespace Runtime.Installers
             Container.DeclareSignal<GameRestartSignal>();
             Container.DeclareSignal<RewardReadyToFlySignal>();
             Container.DeclareSignal<RewardFlyCompleteSignal>();
-            Container.DeclareSignal<RewardCollectedSignal>();
             Container.BindInstance(gameConfig).AsSingle();
             Container.BindInstance(audioConfig).AsSingle();
             CoreInstaller.Install(Container);

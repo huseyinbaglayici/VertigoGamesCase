@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: AudioConfig
   m_EditorClassIdentifier: 
   spinClip: {fileID: 8300000, guid: b8f1a93936336f54da29bf62b1282d4c, type: 3}
-  spinTickClip: {fileID: 8300000, guid: b8f1a93936336f54da29bf62b1282d4c, type: 3}
+  spinTickClip: {fileID: 8300000, guid: 5f382366bad082b4ba8e0d68fefffcc8, type: 3}
   rewardClip: {fileID: 8300000, guid: fe5186ce0ca8aae4ab612c73b574c30c, type: 3}
   goldRewardClip: {fileID: 8300000, guid: f509cb519adc78649a2517de844a275e, type: 3}
-  bombClip: {fileID: 0}
-  takeRewardClip: {fileID: 0}
-  collectClip: {fileID: 0}
+  bombClip: {fileID: 8300000, guid: bd6036454daa4df4f8e2af4afaf477c9, type: 3}
+  takeRewardClip: {fileID: 8300000, guid: 2bec9217dcb0bef4298501ceb8aa05d9, type: 3}
+  collectRewardsClip: {fileID: 0}

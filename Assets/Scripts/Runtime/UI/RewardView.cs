@@ -90,6 +90,7 @@ namespace Runtime.UI
                 if (item.Config.isCurrency) total += item.Amount;
             if (total > 0) _currencyManager.Collect(total);
 
+            _signalBus.Fire<RewardCollectedSignal>();
             _transition.FadeAndReset(() => _signalBus.Fire<GameRestartSignal>());
         }
     }

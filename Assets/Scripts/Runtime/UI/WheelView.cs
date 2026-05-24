@@ -1,8 +1,10 @@
 using System.Collections;
 using DG.Tweening;
+using Runtime.Audio;
 using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
 using Runtime.Signals;
+using Runtime.Utility;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -37,8 +39,10 @@ namespace Runtime.UI
         private SO_GameConfig _gameConfig;
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
+        private AudioService _audioService;
         private bool _isSpinning;
         private bool _gameCompleted;
+        private Coroutine _hapticCoroutine;
 
         #endregion
 
@@ -46,13 +50,14 @@ namespace Runtime.UI
 
         [Inject]
         public void Construct(ISpinManager spinManager, IZoneManager zoneManager, SO_GameConfig gameConfig,
-            SceneTransitionView transition, SignalBus signalBus)
+            SceneTransitionView transition, SignalBus signalBus, AudioService audioService)
         {
             _spinManager = spinManager;
             _zoneManager = zoneManager;
             _gameConfig = gameConfig;
             _transition = transition;
             _signalBus = signalBus;
+            _audioService = audioService;
         }
 
         private void OnValidate()
@@ -96,6 +101,7 @@ namespace Runtime.UI
                 _signalBus.Unsubscribe<GameRestartSignal>(HandleReset);
                 _signalBus.Unsubscribe<RewardFlyCompleteSignal>(GoIdle);
             }
+            if (_hapticCoroutine != null) { StopCoroutine(_hapticCoroutine); _hapticCoroutine = null; }
             transform.DOKill();
             _wheelContent.DOKill();
         }
@@ -107,6 +113,7 @@ namespace Runtime.UI
         private void OnSpinClicked()
         {
             if (_isSpinning) return;
+            HapticFeedback.Play(HapticFeedback.HapticType.Light);
             SetSpinning(true);
             _spinManager.Spin();
         }
@@ -114,14 +121,20 @@ namespace Runtime.UI
         private void HandleSpinDecision(int slotIndex, RewardEntry result)
         {
             _wheelContent.DOKill();
+            if (_hapticCoroutine != null) { StopCoroutine(_hapticCoroutine); _hapticCoroutine = null; }
 
             bool isBomb = result.item.isBomb;
+            _hapticCoroutine = StartCoroutine(SpinHapticCoroutine());
 
             _wheelContent.DORotate(new Vector3(0f, 0f, -ComputeCwDistance(slotIndex)), SpinDuration, RotateMode.FastBeyond360)
                 .SetRelative()
                 .SetEase(SpinCurve)
                 .OnComplete(() =>
                 {
+                    if (_hapticCoroutine != null) { StopCoroutine(_hapticCoroutine); _hapticCoroutine = null; }
+                    HapticFeedback.Play(isBomb
+                        ? HapticFeedback.HapticType.Heavy
+                        : HapticFeedback.HapticType.Medium);
                     if (isBomb) _slotViews[slotIndex].SetSafe();
                     _spinManager.CommitSpinResult();
                     if (isBomb || _gameCompleted) return;
@@ -132,6 +145,30 @@ namespace Runtime.UI
                         Entry = result
                     });
                 });
+        }
+
+        private IEnumerator SpinHapticCoroutine()
+        {
+            float slotStep = 360f / _slotViews.Length;
+            float accumulated = 0f;
+            float nextThreshold = slotStep;
+            float prevAngle = _wheelContent.eulerAngles.z;
+
+            while (true)
+            {
+                yield return null;
+                float currentAngle = _wheelContent.eulerAngles.z;
+                float delta = Mathf.DeltaAngle(currentAngle, prevAngle); // positive = CW
+                if (delta > 0f) accumulated += delta;
+                prevAngle = currentAngle;
+
+                while (accumulated >= nextThreshold)
+                {
+                    HapticFeedback.Play(HapticFeedback.HapticType.Light);
+                    _audioService.PlaySpinTick();
+                    nextThreshold += slotStep;
+                }
+            }
         }
 
         private float ComputeCwDistance(int slotIndex)

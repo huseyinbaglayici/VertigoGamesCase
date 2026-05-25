@@ -13,8 +13,10 @@ namespace Runtime.UI
         [SerializeField] private Button _collectButton;
         [SerializeField] private Button _goBackButton;
 
-        private const string NoItemsMessage  = "You don't have any items yet. Are you sure you want to leave?";
-        private const string HasItemsMessage = "Want to exit and collect your rewards? The best ones are saved for the last!";
+        private const string NoItemsMessage = "You don't have any items yet. Are you sure you want to leave?";
+
+        private const string HasItemsMessage =
+            "Want to exit and collect your rewards? The best ones are saved for the last!";
 
         private const string CollectButtonName = "ui_button_ensure_collect";
         private const string GoBackButtonName = "ui_button_ensure_goback";

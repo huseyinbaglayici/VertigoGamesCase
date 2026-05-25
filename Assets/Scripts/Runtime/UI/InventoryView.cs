@@ -13,19 +13,25 @@ namespace Runtime.UI
 {
     public class InventoryView : MonoBehaviour
     {
+        #region Fields & References
+
         [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private Transform _content;
         [SerializeField] private GameObject _itemPrefab;
         [SerializeField] private Button _exitButton;
 
-        private const string ExitButtonName       = "ui_button_inventory_exit";
-        private const float  ViewportCenterRatio  = 0.5f;
+        private const string ExitButtonName      = "ui_button_inventory_exit";
+        private const float  ViewportCenterRatio = 0.5f;
 
         private IInventoryManager _inventoryManager;
         private ISpinManager _spinManager;
         private IAudioService _audioService;
         private SignalBus _signalBus;
         private readonly Dictionary<SO_ItemConfig, InventoryItemView> _itemViews = new();
+
+        #endregion
+
+        #region Lifecycle
 
         private void OnValidate()
         {
@@ -78,10 +84,13 @@ namespace Runtime.UI
             _exitButton.onClick.RemoveListener(OnExitClicked);
         }
 
-        private void OnSpinStarted(int _, RewardEntry __) => _exitButton.interactable = false;
-        private void OnSpinEnded(RewardEntry _) => _exitButton.interactable = true;
+        #endregion
 
-        private void OnSpinResumed() => _exitButton.interactable = true;
+        #region Item Management
+
+        private void OnSpinStarted(int _, RewardEntry __) => _exitButton.interactable = false;
+        private void OnSpinEnded(RewardEntry _)           => _exitButton.interactable = true;
+        private void OnSpinResumed()                      => _exitButton.interactable = true;
 
         private void OnExitClicked()
         {
@@ -104,6 +113,17 @@ namespace Runtime.UI
                 _itemViews[item.Config].AnimateToAmount(item.Amount);
             }
         }
+
+        private void HandleReset()
+        {
+            foreach (Transform child in _content) Destroy(child.gameObject);
+            _itemViews.Clear();
+            _exitButton.interactable = true;
+        }
+
+        #endregion
+
+        #region Scroll
 
         private void OnScrollRequest(ScrollToItemRequestSignal signal)
         {
@@ -165,11 +185,6 @@ namespace Runtime.UI
             return 1f - offset / scrollable;
         }
 
-        private void HandleReset()
-        {
-            foreach (Transform child in _content) Destroy(child.gameObject);
-            _itemViews.Clear();
-            _exitButton.interactable = true;
-        }
+        #endregion
     }
 }

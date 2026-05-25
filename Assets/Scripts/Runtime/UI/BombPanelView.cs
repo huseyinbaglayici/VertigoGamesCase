@@ -11,6 +11,8 @@ namespace Runtime.UI
 {
     public class BombPanelView : MonoBehaviour
     {
+        #region Fields & References
+
         [SerializeField] private Button _continueButton;
         [SerializeField] private Button _exitButton;
         [SerializeField] private RectTransform _content;
@@ -30,7 +32,11 @@ namespace Runtime.UI
         private int _continueCost;
 
         private const string ContinueButtonName = "ui_button_bomb_revive";
-        private const string ExitButtonName = "ui_button_bomb_exit";
+        private const string ExitButtonName     = "ui_button_bomb_exit";
+
+        #endregion
+
+        #region Lifecycle
 
         private void OnValidate()
         {
@@ -74,6 +80,10 @@ namespace Runtime.UI
             _content.DOKill();
         }
 
+        #endregion
+
+        #region Show / Hide
+
         private void Show()
         {
             if (_continueButtonText != null)
@@ -103,6 +113,10 @@ namespace Runtime.UI
             gameObject.SetActive(false);
         }
 
+        #endregion
+
+        #region Handlers
+
         private void RefreshContinueButton(int currency)
         {
             _continueButton.interactable = currency >= _continueCost;
@@ -119,5 +133,7 @@ namespace Runtime.UI
             _audioService.StopBombSfx();
             _transition.FadeAndReset(() => _signalBus.Fire<GameRestartSignal>());
         }
+
+        #endregion
     }
 }

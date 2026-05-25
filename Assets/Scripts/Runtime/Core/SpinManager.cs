@@ -10,6 +10,8 @@ namespace Runtime.Core
 {
     public class SpinManager : ISpinManager, IDisposable
     {
+        #region Fields
+
         private readonly IZoneManager _zoneManager;
         private readonly IInventoryManager _inventoryManager;
         private readonly System.Random _random;
@@ -18,13 +20,17 @@ namespace Runtime.Core
 
         private RewardEntry _pendingResult;
         private int _pendingSlotIndex;
-        private readonly HashSet<int> _excludedSlots = new HashSet<int>();
+        private readonly HashSet<int> _excludedSlots = new();
 
         public event Action<int, RewardEntry> OnSpinDecision;
         public event Action<RewardEntry> OnSpinCompleted;
         public event Action OnBombHit;
         public event Action OnGameResumed;
         public event Action OnRewardsRequested;
+
+        #endregion
+
+        #region Lifecycle
 
         public SpinManager(IZoneManager zoneManager, IInventoryManager inventoryManager, System.Random random,
             RewardCalculator rewardCalculator, SignalBus signalBus)
@@ -38,6 +44,10 @@ namespace Runtime.Core
         }
 
         public void Dispose() => _signalBus.Unsubscribe<GameRestartSignal>(OnReset);
+
+        #endregion
+
+        #region Spin Logic
 
         public void Spin()
         {
@@ -98,10 +108,16 @@ namespace Runtime.Core
             OnSpinCompleted?.Invoke(result);
         }
 
+        #endregion
+
+        #region State
+
         private void OnReset()
         {
             _pendingResult = null;
             _excludedSlots.Clear();
         }
+
+        #endregion
     }
 }

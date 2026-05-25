@@ -11,11 +11,12 @@ namespace Runtime.UI
 {
     public class SpecialRewardPopupView : MonoBehaviour
     {
+        #region Fields & References
+
         [SerializeField] private Image _itemIcon;
         [SerializeField] private TextMeshProUGUI _itemNameText;
         [SerializeField] private Button _collectButton;
         [SerializeField] private Transform _effectImage;
-
 
         private const string ContinueButtonName = "ui_button_reward_collect";
 
@@ -25,6 +26,14 @@ namespace Runtime.UI
         private const float FlipYDuration     = 2.5f;
         private const float FlipXMaxAngle     = 8f;
         private const float FlipXDuration     = 1.8f;
+
+        private SignalBus _signalBus;
+        private SO_GameConfig _gameConfig;
+        private IAudioService _audioService;
+
+        #endregion
+
+        #region Lifecycle
 
         private void OnValidate()
         {
@@ -39,10 +48,6 @@ namespace Runtime.UI
             }
         }
 
-        private SignalBus _signalBus;
-        private SO_GameConfig _gameConfig;
-        private IAudioService _audioService;
-
         [Inject]
         public void Construct(SignalBus signalBus, SO_GameConfig gameConfig, IAudioService audioService)
         {
@@ -51,15 +56,6 @@ namespace Runtime.UI
             _audioService = audioService;
             _signalBus.Subscribe<GoldZoneEnteredSignal>(Show);
             _signalBus.Subscribe<GameRestartSignal>(Hide);
-
-            if (_collectButton == null)
-                foreach (var button in GetComponentsInChildren<Button>(true))
-                    if (button.gameObject.name == ContinueButtonName)
-                    {
-                        _collectButton = button;
-                        break;
-                    }
-
             _collectButton.onClick.AddListener(OnContinueClicked);
         }
 
@@ -75,6 +71,10 @@ namespace Runtime.UI
             if (_effectImage != null) _effectImage.DOKill();
             if (_itemIcon != null) _itemIcon.transform.DOKill();
         }
+
+        #endregion
+
+        #region Show / Hide
 
         private void Show()
         {
@@ -92,6 +92,24 @@ namespace Runtime.UI
             PlayBreathAnimation();
             _audioService.PlaySpecialItemOpenSfx();
         }
+
+        private void Hide()
+        {
+            if (_effectImage != null) _effectImage.DOKill();
+            if (_itemIcon != null) _itemIcon.transform.DOKill();
+            gameObject.SetActive(false);
+        }
+
+        private void OnContinueClicked()
+        {
+            _audioService.PlayCollectSfx();
+            Hide();
+            _signalBus.Fire<GoldZoneAcknowledgedSignal>();
+        }
+
+        #endregion
+
+        #region Animation
 
         private void PlayBreathAnimation()
         {
@@ -126,18 +144,6 @@ namespace Runtime.UI
             }
         }
 
-        private void Hide()
-        {
-            if (_effectImage != null) _effectImage.DOKill();
-            if (_itemIcon != null) _itemIcon.transform.DOKill();
-            gameObject.SetActive(false);
-        }
-
-        private void OnContinueClicked()
-        {
-            _audioService.PlayCollectSfx();
-            Hide();
-            _signalBus.Fire<GoldZoneAcknowledgedSignal>();
-        }
+        #endregion
     }
 }

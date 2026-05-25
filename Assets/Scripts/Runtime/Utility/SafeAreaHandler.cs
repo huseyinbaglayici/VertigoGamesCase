@@ -5,9 +5,9 @@ namespace Runtime.Utility
     [RequireComponent(typeof(RectTransform))]
     public class SafeAreaHandler : MonoBehaviour
     {
-        RectTransform _rectTransform;
-        Rect _lastSafeArea;
-        Vector2Int _lastScreenSize;
+        private RectTransform _rectTransform;
+        private Rect _lastSafeArea;
+        private Vector2Int _lastScreenSize;
 
         void Awake()
         {

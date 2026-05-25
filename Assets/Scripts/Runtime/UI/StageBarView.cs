@@ -12,6 +12,8 @@ namespace Runtime.UI
 {
     public class StageBarView : MonoBehaviour
     {
+        #region Fields & References
+
         [SerializeField] private ScrollRect _scrollRect;
         [SerializeField] private GameObject _stagePrefab;
         [SerializeField] private float _slideDuration = 0.3f;
@@ -29,6 +31,10 @@ namespace Runtime.UI
         private SignalBus _signalBus;
 
         private readonly List<StageItemView> _stageItems = new();
+
+        #endregion
+
+        #region Lifecycle
 
         [Inject]
         public void Construct(IZoneManager zoneManager, ISpinManager spinManager, SO_GameConfig gameConfig,
@@ -58,31 +64,9 @@ namespace Runtime.UI
             if (_transition != null) _transition.OnOpened -= PlayIntro;
         }
 
-        private void PlayIntro()
-        {
-            _transition.OnOpened -= PlayIntro;
-            StartCoroutine(IntroSlide());
-        }
+        #endregion
 
-        private IEnumerator IntroSlide()
-        {
-            yield return new WaitForEndOfFrame();
-            SlideToZone(_zoneManager.CurrentZone);
-            _stageItems[_zoneManager.CurrentZone - 1].Activate();
-            PunchFrame();
-        }
-
-        private IEnumerator InstantiateStages()
-        {
-            for (int i = 1; i <= _gameConfig.goldZoneInterval; i++)
-            {
-                var go = Instantiate(_stagePrefab, _scrollRect.content);
-                var view = go.GetComponent<StageItemView>();
-                view.Setup(i, _zoneManager.GetZoneType(i), _gameConfig.stageConfig);
-                _stageItems.Add(view);
-                if (i % _instantiatePerFrame == 0) yield return null;
-            }
-        }
+        #region Stage Management
 
         private void OnZoneChanged(int zone)
         {
@@ -111,6 +95,36 @@ namespace Runtime.UI
                 _stageItems[prevIndex].FadeOutToPassed();
         }
 
+        #endregion
+
+        #region Animation
+
+        private void PlayIntro()
+        {
+            _transition.OnOpened -= PlayIntro;
+            StartCoroutine(IntroSlide());
+        }
+
+        private IEnumerator IntroSlide()
+        {
+            yield return new WaitForEndOfFrame();
+            SlideToZone(_zoneManager.CurrentZone);
+            _stageItems[_zoneManager.CurrentZone - 1].Activate();
+            PunchFrame();
+        }
+
+        private IEnumerator InstantiateStages()
+        {
+            for (int i = 1; i <= _gameConfig.goldZoneInterval; i++)
+            {
+                var go = Instantiate(_stagePrefab, _scrollRect.content);
+                var view = go.GetComponent<StageItemView>();
+                view.Setup(i, _zoneManager.GetZoneType(i), _gameConfig.stageConfig);
+                _stageItems.Add(view);
+                if (i % _instantiatePerFrame == 0) yield return null;
+            }
+        }
+
         private void SlideToZone(int zone)
         {
             Canvas.ForceUpdateCanvases();
@@ -125,5 +139,7 @@ namespace Runtime.UI
             _currentStageFrame.DOPunchScale(new Vector3(_punchScale, _punchScale * 0.5f, 0f), _punchDuration,
                 _punchVibrato, _punchElasticity);
         }
+
+        #endregion
     }
 }

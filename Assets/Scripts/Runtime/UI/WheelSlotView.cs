@@ -46,5 +46,10 @@ namespace Runtime.UI
             _iconImage.color = color;
             _amountText.text = text;
         }
+
+        public void LockRotation()
+        {
+            _cell.transform.rotation = Quaternion.identity;
+        }
     }
 }

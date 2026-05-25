@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using DG.Tweening;
 using Runtime.Core;
@@ -85,6 +86,12 @@ namespace Runtime.UI
                 _transition.OnOpened -= PlayIntro;
                 PlayIntro();
             }
+        }
+
+        private void LateUpdate()
+        {
+            foreach (var slot in _slotViews)
+                slot.LockRotation();
         }
 
         private void OnDestroy()

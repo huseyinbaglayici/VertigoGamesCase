@@ -3253,7 +3253,7 @@ GameObject:
   - component: {fileID: 641757733}
   - component: {fileID: 641757732}
   m_Layer: 5
-  m_Name: ui_image_reward (3)
+  m_Name: ui_image_reward_value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4296,7 +4296,7 @@ GameObject:
   - component: {fileID: 997236544}
   - component: {fileID: 997236543}
   m_Layer: 5
-  m_Name: ui_image_reward (1)
+  m_Name: ui_image_reward_value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5931,7 +5931,7 @@ GameObject:
   - component: {fileID: 1388275927}
   - component: {fileID: 1388275926}
   m_Layer: 5
-  m_Name: ui_image_reward (4)
+  m_Name: ui_image_reward_value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6147,7 +6147,7 @@ GameObject:
   - component: {fileID: 1471744161}
   - component: {fileID: 1471744160}
   m_Layer: 5
-  m_Name: ui_text_ensure_exit
+  m_Name: ui_text_ensure_exit_value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8268,7 +8268,7 @@ GameObject:
   - component: {fileID: 1848532929}
   - component: {fileID: 1848532928}
   m_Layer: 5
-  m_Name: ui_image_reward
+  m_Name: ui_image_reward_value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8664,7 +8664,7 @@ GameObject:
   - component: {fileID: 1962191944}
   - component: {fileID: 1962191943}
   m_Layer: 5
-  m_Name: ui_image_reward (2)
+  m_Name: ui_image_reward_value
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,5 +1,4 @@
 using DG.Tweening;
-using Runtime.Audio;
 using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
 using Runtime.Signals;
@@ -15,13 +14,12 @@ namespace Runtime.UI
         [SerializeField] private Transform _content;
         [SerializeField] private RewardItemView _itemPrefab;
         [SerializeField] private Button _collectButton;
-        [SerializeField] private Transform _effectImage;
 
         private IInventoryManager _inventoryManager;
         private ICurrencyManager _currencyManager;
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
-        private AudioService _audioService;
+        private IAudioService _audioService;
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
         private SO_RewardAnimationConfig.ItemPopIn _cfg;
@@ -42,7 +40,7 @@ namespace Runtime.UI
 
         [Inject]
         public void Construct(IInventoryManager inventoryManager, ICurrencyManager currencyManager,
-            ISpinManager spinManager, IZoneManager zoneManager, AudioService audioService,
+            ISpinManager spinManager, IZoneManager zoneManager, IAudioService audioService,
             SceneTransitionView transition, SignalBus signalBus, SO_RewardAnimationConfig animConfig)
         {
             _inventoryManager = inventoryManager;
@@ -74,7 +72,6 @@ namespace Runtime.UI
                 Destroy(child.gameObject);
 
             gameObject.SetActive(true);
-            PlayBreathAnimation();
 
             int index = 0;
             foreach (var item in _inventoryManager.GetItems())
@@ -95,29 +92,15 @@ namespace Runtime.UI
             }
         }
 
-        private void PlayBreathAnimation()
-        {
-            if (_effectImage == null) return;
-            _effectImage.DOKill();
-            _effectImage.localScale = Vector3.one;
-            _effectImage.DOScale(1.06f, 1.2f)
-                .SetEase(Ease.InOutSine)
-                .SetLoops(-1, LoopType.Yoyo);
-        }
-
         private void HandleReset()
         {
             foreach (Transform child in _content) Destroy(child.gameObject);
-            if (_effectImage != null) _effectImage.DOKill();
             gameObject.SetActive(false);
         }
 
         private void OnCollectClicked()
         {
-            int total = 0;
-            foreach (var item in _inventoryManager.GetItems())
-                if (item.Config.isCurrency)
-                    total += item.Amount;
+            int total = _inventoryManager.GetTotalCurrency();
             if (total > 0) _currencyManager.Collect(total);
 
             _audioService.PlayCollectSfx();

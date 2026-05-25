@@ -26,7 +26,7 @@ namespace Runtime.UI
             _amountText = _cell.AmountText;
         }
 
-        public void Setup(RewardEntry entry, int currentZone, int totalZones)
+        public void Setup(RewardEntry entry, int amount)
         {
             _iconImage.sprite = entry.item.icon;
 
@@ -36,7 +36,6 @@ namespace Runtime.UI
                 return;
             }
 
-            int amount = CalculateAmount(entry, currentZone, totalZones);
             SetDisplay(Color.white, $"x{amount}");
         }
 
@@ -46,12 +45,6 @@ namespace Runtime.UI
         {
             _iconImage.color = color;
             _amountText.text = text;
-        }
-
-        private static int CalculateAmount(RewardEntry entry, int currentZone, int totalZones)
-        {
-            float t = (float)(currentZone - 1) / (totalZones - 1);
-            return Mathf.RoundToInt(Mathf.Lerp(entry.minAmount, entry.maxAmount, t));
         }
     }
 }

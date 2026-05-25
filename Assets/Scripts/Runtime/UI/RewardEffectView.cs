@@ -11,6 +11,8 @@ namespace Runtime.UI
     {
         [SerializeField] private Image[] _particles;
 
+        private const float FullRotation = 360f;
+
         private SO_RewardAnimationConfig.ParticleScatterFly _cfg;
         private SignalBus _signalBus;
 
@@ -41,7 +43,7 @@ namespace Runtime.UI
         {
             gameObject.SetActive(true);
 
-            float angleStep = 360f / _particles.Length;
+            float angleStep = FullRotation / _particles.Length;
             Vector3 slotLocal = transform.InverseTransformPoint(slotTransform.position);
 
             for (int i = 0; i < _particles.Length; i++)

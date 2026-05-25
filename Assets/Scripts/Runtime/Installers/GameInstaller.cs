@@ -18,6 +18,7 @@ namespace Runtime.Installers
             Container.DeclareSignal<ScrollToItemCompleteSignal>();
             Container.DeclareSignal<GoldZoneEnteredSignal>();
             Container.DeclareSignal<GoldZoneAcknowledgedSignal>();
+            Container.DeclareSignal<ExitConfirmRequestSignal>();
             CoreInstaller.Install(Container);
         }
     }

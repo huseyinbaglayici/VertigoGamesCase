@@ -1,6 +1,6 @@
 using System.Collections;
 using DG.Tweening;
-using Runtime.Audio;
+using Runtime.Core;
 using Runtime.Data.UnityObjects;
 using Runtime.Enums;
 using Runtime.Interfaces;
@@ -28,11 +28,11 @@ namespace Runtime.UI
 
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
-        private SO_GameConfig _gameConfig;
+        private RewardCalculator _rewardCalculator;
         private SO_WheelAnimationConfig _animCfg;
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
-        private AudioService _audioService;
+        private IAudioService _audioService;
         private bool _isSpinning;
         private bool _gameCompleted;
         private Coroutine _hapticCoroutine;
@@ -42,13 +42,13 @@ namespace Runtime.UI
         #region Lifecycle
 
         [Inject]
-        public void Construct(ISpinManager spinManager, IZoneManager zoneManager, SO_GameConfig gameConfig,
+        public void Construct(ISpinManager spinManager, IZoneManager zoneManager, RewardCalculator rewardCalculator,
             SO_WheelAnimationConfig animConfig, SceneTransitionView transition, SignalBus signalBus,
-            AudioService audioService)
+            IAudioService audioService)
         {
             _spinManager = spinManager;
             _zoneManager = zoneManager;
-            _gameConfig = gameConfig;
+            _rewardCalculator = rewardCalculator;
             _animCfg = animConfig;
             _transition = transition;
             _signalBus = signalBus;
@@ -114,6 +114,8 @@ namespace Runtime.UI
             if (_isSpinning) return;
             HapticFeedback.Play(HapticFeedback.HapticType.Light);
             SetSpinning(true);
+            transform.DOKill();
+            transform.DOPunchScale(Vector3.one * 0.1f, 0.2f, 1, 0.3f);
             _spinManager.Spin();
         }
 
@@ -128,7 +130,7 @@ namespace Runtime.UI
             _wheelContent.DORotate(new Vector3(0f, 0f, -ComputeCwDistance(slotIndex)), _animCfg.spinDuration,
                     RotateMode.FastBeyond360)
                 .SetRelative()
-                .SetEase(_animCfg.spinCurve)
+                .SetEase(_animCfg.spinEase)
                 .OnComplete(() => OnSpinComplete(slotIndex, result, isBomb));
         }
 
@@ -282,7 +284,12 @@ namespace Runtime.UI
             _wheelBaseImage.sprite = config.baseSprite;
             _indicatorImage.sprite = config.indicatorSprite;
             for (int i = 0; i < _slotViews.Length; i++)
-                _slotViews[i].Setup(rewardSet.rewards[i], _zoneManager.CurrentZone, _gameConfig.goldZoneInterval);
+            {
+                var entry = rewardSet.rewards[i];
+                int amount = entry.item.isBomb ? 0
+                    : _rewardCalculator.Calculate(entry.minAmount, entry.maxAmount, _zoneManager.CurrentZone);
+                _slotViews[i].Setup(entry, amount);
+            }
         }
 
         #endregion

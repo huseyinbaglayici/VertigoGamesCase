@@ -12,6 +12,16 @@ namespace Runtime.Utility
         }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
+        private const int MinApiLevelForVibrationEffect = 26;
+
+        private const int LightDurationMs  = 12;
+        private const int MediumDurationMs = 40;
+        private const int HeavyDurationMs  = 80;
+
+        private const int LightAmplitude  = 35;
+        private const int MediumAmplitude = 150;
+        private const int HeavyAmplitude  = 255;
+
         private static AndroidJavaObject _vibrator;
         private static int _apiLevel = -1;
 
@@ -53,15 +63,15 @@ namespace Runtime.Utility
         {
             int durationMs = type switch
             {
-                HapticType.Light  => 12,
-                HapticType.Heavy  => 80,
-                _                 => 40
+                HapticType.Light => LightDurationMs,
+                HapticType.Heavy => HeavyDurationMs,
+                _                => MediumDurationMs
             };
             int amplitude = type switch
             {
-                HapticType.Light  => 35,
-                HapticType.Heavy  => 255,
-                _                 => 150
+                HapticType.Light => LightAmplitude,
+                HapticType.Heavy => HeavyAmplitude,
+                _                => MediumAmplitude
             };
 
             try
@@ -69,7 +79,7 @@ namespace Runtime.Utility
                 var vib = Vibrator;
                 if (vib == null) return;
 
-                if (ApiLevel >= 26)
+                if (ApiLevel >= MinApiLevelForVibrationEffect)
                 {
                     using var effectClass = new AndroidJavaClass("android.os.VibrationEffect");
                     using var effect = effectClass.CallStatic<AndroidJavaObject>(

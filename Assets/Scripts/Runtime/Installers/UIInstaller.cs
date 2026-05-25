@@ -1,4 +1,5 @@
 using Runtime.Audio;
+using Runtime.Interfaces;
 using Runtime.UI;
 using UnityEngine;
 using Zenject;
@@ -27,7 +28,7 @@ namespace Runtime.Installers
             Container.BindInstance(_stageBarView).AsSingle();
             Container.BindInstance(_rewardEffectView).AsSingle().NonLazy();
             Container.BindInstance(_currencyHudView).AsSingle();
-            Container.BindInstance(_audioService).AsSingle().NonLazy();
+            Container.Bind<IAudioService>().FromInstance(_audioService).AsSingle().NonLazy();
         }
     }
 }

@@ -1,5 +1,4 @@
 using DG.Tweening;
-using Runtime.Audio;
 using Runtime.Data.UnityObjects;
 using Runtime.Interfaces;
 using Runtime.Signals;
@@ -18,14 +17,14 @@ namespace Runtime.UI
 
         private TextMeshProUGUI _continueButtonText;
 
-        [Header("Show Animation")] [SerializeField]
-        private float _showDuration = 0.4f;
-
-        [SerializeField] private Ease _showEase = Ease.OutBack;
+        [Header("Show / Hide Animation")]
+        [SerializeField] private float _showDuration = 0.4f;
+        [SerializeField] private Ease  _showEase     = Ease.OutBack;
+        [SerializeField] private Ease  _hideEase     = Ease.InBack;
 
         private ISpinManager _spinManager;
         private ICurrencyManager _currencyManager;
-        private AudioService _audioService;
+        private IAudioService _audioService;
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
         private int _continueCost;
@@ -50,7 +49,7 @@ namespace Runtime.UI
         [Inject]
         public void Construct(ISpinManager spinManager, ICurrencyManager currencyManager,
             SO_GameConfig gameConfig, SceneTransitionView transition, SignalBus signalBus,
-            AudioService audioService)
+            IAudioService audioService)
         {
             _spinManager = spinManager;
             _currencyManager = currencyManager;
@@ -88,7 +87,7 @@ namespace Runtime.UI
         private void Hide()
         {
             _content.DOScale(Vector3.zero, _showDuration)
-                .SetEase(Ease.InBack)
+                .SetEase(_hideEase)
                 .OnComplete(() =>
                 {
                     _audioService.StopBombSfx();

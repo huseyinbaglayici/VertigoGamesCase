@@ -9,6 +9,8 @@ namespace Runtime.UI
 {
     public class RewardItemView : MonoBehaviour
     {
+        private const float FullRotation = 360f;
+
         [SerializeField] private Image _icon;
         [SerializeField] private TextMeshProUGUI _nameText;
         [SerializeField] private TextMeshProUGUI _amountText;
@@ -30,7 +32,7 @@ namespace Runtime.UI
 
         public void PlaySpreadEffect()
         {
-            float angleStep = 360f / _particles.Length;
+            float angleStep = FullRotation / _particles.Length;
             for (int i = 0; i < _particles.Length; i++)
             {
                 var particle = _particles[i];

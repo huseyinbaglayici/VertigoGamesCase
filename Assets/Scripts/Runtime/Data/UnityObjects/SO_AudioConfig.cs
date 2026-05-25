@@ -14,6 +14,7 @@ namespace Runtime.Data.UnityObjects
         public AudioClip takeRewardClip;
         public AudioClip collectRewardsClip;
         public AudioClip itemPopClip;
+        public AudioClip specialItemOpenClip;
 
         public override void InstallBindings()
         {

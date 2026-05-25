@@ -9,5 +9,6 @@ namespace Runtime.Interfaces
         event Action<ItemData, bool> OnItemAdded;
         void AddItem(ItemData item);
         IReadOnlyList<ItemData> GetItems();
+        int GetTotalCurrency();
     }
 }

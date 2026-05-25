@@ -1,6 +1,5 @@
 using DG.Tweening;
 using Runtime.Data.UnityObjects;
-using Runtime.Data.ValueObjects;
 using Runtime.Interfaces;
 using Runtime.Signals;
 using TMPro;
@@ -20,6 +19,13 @@ namespace Runtime.UI
 
         private const string ContinueButtonName = "ui_button_reward_collect";
 
+        private const float BreathTargetScale = 1.06f;
+        private const float BreathDuration    = 1.2f;
+        private const float FlipYMaxAngle     = 25f;
+        private const float FlipYDuration     = 2.5f;
+        private const float FlipXMaxAngle     = 8f;
+        private const float FlipXDuration     = 1.8f;
+
         private void OnValidate()
         {
             if (_collectButton != null) return;
@@ -35,14 +41,14 @@ namespace Runtime.UI
 
         private SignalBus _signalBus;
         private SO_GameConfig _gameConfig;
-        private IInventoryManager _inventoryManager;
+        private IAudioService _audioService;
 
         [Inject]
-        public void Construct(SignalBus signalBus, SO_GameConfig gameConfig, IInventoryManager inventoryManager)
+        public void Construct(SignalBus signalBus, SO_GameConfig gameConfig, IAudioService audioService)
         {
             _signalBus = signalBus;
             _gameConfig = gameConfig;
-            _inventoryManager = inventoryManager;
+            _audioService = audioService;
             _signalBus.Subscribe<GoldZoneEnteredSignal>(Show);
             _signalBus.Subscribe<GameRestartSignal>(Hide);
 
@@ -79,13 +85,12 @@ namespace Runtime.UI
                 return;
             }
 
-            _inventoryManager.AddItem(new ItemData(item, 1));
-
             if (_itemIcon != null) _itemIcon.sprite = item.icon;
             if (_itemNameText != null) _itemNameText.text = item.itemName;
 
             gameObject.SetActive(true);
             PlayBreathAnimation();
+            _audioService.PlaySpecialItemOpenSfx();
         }
 
         private void PlayBreathAnimation()
@@ -94,7 +99,7 @@ namespace Runtime.UI
             {
                 _effectImage.DOKill();
                 _effectImage.localScale = Vector3.one;
-                _effectImage.DOScale(1.06f, 1.2f)
+                _effectImage.DOScale(BreathTargetScale, BreathDuration)
                     .SetEase(Ease.InOutSine)
                     .SetLoops(-1, LoopType.Yoyo);
             }
@@ -110,14 +115,14 @@ namespace Runtime.UI
                     {
                         yAngle = v;
                         iconT.localRotation = Quaternion.Euler(xAngle, yAngle, 0f);
-                    }, 25f, 2.5f)
-                    .From(-25f).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
+                    }, FlipYMaxAngle, FlipYDuration)
+                    .From(-FlipYMaxAngle).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
                 DOTween.To(() => xAngle, v =>
                     {
                         xAngle = v;
                         iconT.localRotation = Quaternion.Euler(xAngle, yAngle, 0f);
-                    }, 8f, 1.8f)
-                    .From(-8f).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
+                    }, FlipXMaxAngle, FlipXDuration)
+                    .From(-FlipXMaxAngle).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
             }
         }
 
@@ -130,6 +135,7 @@ namespace Runtime.UI
 
         private void OnContinueClicked()
         {
+            _audioService.PlayCollectSfx();
             Hide();
             _signalBus.Fire<GoldZoneAcknowledgedSignal>();
         }

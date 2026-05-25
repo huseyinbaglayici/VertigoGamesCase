@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
-using Runtime.Audio;
 using Runtime.Data.UnityObjects;
 using Runtime.Data.ValueObjects;
 using Runtime.Interfaces;
@@ -19,11 +18,12 @@ namespace Runtime.UI
         [SerializeField] private GameObject _itemPrefab;
         [SerializeField] private Button _exitButton;
 
-        private const string ExitButtonName = "ui_button_inventory_exit";
+        private const string ExitButtonName       = "ui_button_inventory_exit";
+        private const float  ViewportCenterRatio  = 0.5f;
 
         private IInventoryManager _inventoryManager;
         private ISpinManager _spinManager;
-        private AudioService _audioService;
+        private IAudioService _audioService;
         private SignalBus _signalBus;
         private readonly Dictionary<SO_ItemConfig, InventoryItemView> _itemViews = new();
 
@@ -40,7 +40,7 @@ namespace Runtime.UI
 
         [Inject]
         public void Construct(IInventoryManager inventoryManager, ISpinManager spinManager,
-            AudioService audioService, SignalBus signalBus)
+            IAudioService audioService, SignalBus signalBus)
         {
             _inventoryManager = inventoryManager;
             _spinManager = spinManager;
@@ -85,7 +85,8 @@ namespace Runtime.UI
 
         private void OnExitClicked()
         {
-            _spinManager.RequestRewards();
+            bool hasItems = _inventoryManager.GetItems().Count > 0;
+            _signalBus.Fire(new ExitConfirmRequestSignal { HasItems = hasItems });
         }
 
         private void HandleItemAdded(ItemData item, bool isNew)
@@ -160,7 +161,7 @@ namespace Runtime.UI
             if (scrollable <= 0f) return 1f;
 
             float itemLocalY = contentRect.InverseTransformPoint(item.position).y;
-            float offset = Mathf.Clamp(-itemLocalY - _scrollRect.viewport.rect.height * 0.5f, 0f, scrollable);
+            float offset = Mathf.Clamp(-itemLocalY - _scrollRect.viewport.rect.height * ViewportCenterRatio, 0f, scrollable);
             return 1f - offset / scrollable;
         }
 

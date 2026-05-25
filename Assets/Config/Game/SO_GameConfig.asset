@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   silverZoneInterval: 5
   goldZoneInterval: 30
-  continueCost: 10
+  continueCost: 0
   normalWheel: {fileID: 11400000, guid: d665501e6e0ea684897f476bcd6f76b9, type: 2}
   silverWheel: {fileID: 11400000, guid: a9fd9db948506fd4b995e04a32d0e1a3, type: 2}
   goldWheel: {fileID: 11400000, guid: 269b2c9c865fccd4da0b9b703f94be73, type: 2}

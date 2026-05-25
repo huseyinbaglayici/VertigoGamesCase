@@ -1,10 +1,11 @@
 using Runtime.Data.UnityObjects;
+using Runtime.Interfaces;
 using UnityEngine;
 using Zenject;
 
 namespace Runtime.Audio
 {
-    public class AudioService : MonoBehaviour
+    public class AudioService : MonoBehaviour, IAudioService
     {
         [SerializeField] private AudioSource _sfxSource;
         [SerializeField] private AudioSource _spinSource;
@@ -25,8 +26,9 @@ namespace Runtime.Audio
         public void PlayRewardSfx()     => PlayOneShot(_config.rewardClip);
         public void PlayGoldRewardSfx() => PlayOneShot(_config.goldRewardClip);
         public void PlayTakeRewardSfx() => PlayOneShot(_config.takeRewardClip);
-        public void PlayCollectSfx()    => PlayOneShot(_config.collectRewardsClip);
-        public void PlayItemPopSfx()    => PlayOneShot(_config.itemPopClip);
+        public void PlayCollectSfx()           => PlayOneShot(_config.collectRewardsClip);
+        public void PlayItemPopSfx()           => PlayOneShot(_config.itemPopClip);
+        public void PlaySpecialItemOpenSfx() => PlayOneShot(_config.specialItemOpenClip);
 
         // PlayMain: main clip slot — Stop() ile durdurulabilir (PlayOneShot'ları etkilemez)
         private void PlayMain(AudioClip clip)

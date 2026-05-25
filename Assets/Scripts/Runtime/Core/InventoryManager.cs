@@ -40,6 +40,14 @@ namespace Runtime.Core
 
         public IReadOnlyList<ItemData> GetItems() => _items;
 
+        public int GetTotalCurrency()
+        {
+            int total = 0;
+            foreach (var item in _items)
+                if (item.Config.isCurrency) total += item.Amount;
+            return total;
+        }
+
         private void OnReset() => _items.Clear();
     }
 }

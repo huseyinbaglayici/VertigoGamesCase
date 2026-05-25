@@ -1,6 +1,6 @@
 # Vertigo Games Case Study
 
-[Gameplay Video](https://drive.google.com/file/d/1oHRn95ikZEJHzMEvNrYq00Pv1fPsbzdo/view?usp=sharing)
+[Gameplay Video](https://drive.google.com/file/d/15h0Uuxh8gEI17WIqAj6CL7u66hkxPvW7/view?usp=sharing)
 
 ---
 

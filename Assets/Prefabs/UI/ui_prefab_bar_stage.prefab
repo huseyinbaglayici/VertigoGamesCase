@@ -99,7 +99,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 10
   m_fontSizeMax: 40
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -197,6 +197,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageText: {fileID: 647315024}
   backgroundImage: {fileID: 9113646879814718679}
+  _fadeDuration: 0.4
 --- !u!1 &9141958813624578663
 GameObject:
   m_ObjectHideFlags: 0

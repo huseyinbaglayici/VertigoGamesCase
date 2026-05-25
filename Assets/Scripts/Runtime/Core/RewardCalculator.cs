@@ -14,8 +14,9 @@ namespace Runtime.Core
 
         public int Calculate(int minAmount, int maxAmount, int currentZone)
         {
-            float t = (float)(currentZone - 1) / (_gameConfig.goldZoneInterval - 1);
-            t = Math.Clamp(t, 0, 1);
+            int divisor = _gameConfig.goldZoneInterval - 1;
+            if (divisor <= 0) return maxAmount;
+            float t = Math.Clamp((float)(currentZone - 1) / divisor, 0f, 1f);
             return (int)Math.Round(minAmount + (maxAmount - minAmount) * t);
         }
     }

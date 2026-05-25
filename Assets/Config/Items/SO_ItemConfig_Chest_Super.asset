@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f9e302ee42744f2bb3c05d737b83ebc, type: 3}
-  m_Name: SO_ItemConfig_Chest_Bronze
+  m_Name: SO_ItemConfig_Chest_Super
   m_EditorClassIdentifier: 
-  itemName: Bronze Chest
-  icon: {fileID: 21300000, guid: 05b3b8b4fa20a934ba0df843c3a5efc9, type: 3}
+  itemName: SUPER CHEST
+  icon: {fileID: 21300000, guid: e08a970924fdf9946bc7a57650ac5183, type: 3}
   isBomb: 0
+  isCurrency: 0

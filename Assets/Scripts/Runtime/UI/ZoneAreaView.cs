@@ -3,6 +3,7 @@ using Runtime.Enums;
 using Runtime.Interfaces;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace Runtime.UI
@@ -11,6 +12,7 @@ namespace Runtime.UI
     {
         [SerializeField] private TextMeshProUGUI _silverText;
         [SerializeField] private TextMeshProUGUI _goldText;
+        [SerializeField] private Image _specialItemIcon;
 
         private const string SilverTextName = "ui_text_area_silver_value";
         private const string GoldTextName = "ui_text_area_gold_value";
@@ -38,6 +40,10 @@ namespace Runtime.UI
         {
             _zoneManager.OnZoneChanged += UpdateTexts;
             UpdateTexts(_zoneManager.CurrentZone);
+
+            var specialItem = _gameConfig.goldWheel?.specialItem;
+            if (_specialItemIcon != null && specialItem != null)
+                _specialItemIcon.sprite = specialItem.icon;
         }
 
         private void OnDestroy()
@@ -48,10 +54,10 @@ namespace Runtime.UI
 
         private void UpdateTexts(int zone)
         {
-            _silverText.text = FormatZoneText(_gameConfig.stageConfig.silverAreaLabel,
-                GetNextZoneOfType(zone, ZoneType.Silver));
-            _goldText.text = FormatZoneText(_gameConfig.stageConfig.goldAreaLabel,
-                GetNextZoneOfType(zone, ZoneType.Gold));
+            int nextSilver = GetNextZoneOfType(zone, ZoneType.Silver);
+            int nextGold = GetNextZoneOfType(zone, ZoneType.Gold);
+            _silverText.text = nextSilver > 0 ? nextSilver.ToString() : string.Empty;
+            _goldText.text = nextGold > 0 ? nextGold.ToString() : string.Empty;
         }
 
         private int GetNextZoneOfType(int currentZone, ZoneType type)
@@ -61,8 +67,5 @@ namespace Runtime.UI
                     return z;
             return 0;
         }
-
-        private static string FormatZoneText(string label, int next) =>
-            next > 0 ? $"{label} {next}" : string.Empty;
     }
 }

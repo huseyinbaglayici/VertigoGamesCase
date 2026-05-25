@@ -9,5 +9,6 @@ namespace Runtime.Data.UnityObjects
         public Sprite icon;
         public bool isBomb;
         public bool isCurrency;
+        public bool isSpecial;
     }
 }

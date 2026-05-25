@@ -16,6 +16,8 @@ namespace Runtime.Installers
             Container.DeclareSignal<RewardFlyCompleteSignal>();
             Container.DeclareSignal<ScrollToItemRequestSignal>();
             Container.DeclareSignal<ScrollToItemCompleteSignal>();
+            Container.DeclareSignal<GoldZoneEnteredSignal>();
+            Container.DeclareSignal<GoldZoneAcknowledgedSignal>();
             CoreInstaller.Install(Container);
         }
     }

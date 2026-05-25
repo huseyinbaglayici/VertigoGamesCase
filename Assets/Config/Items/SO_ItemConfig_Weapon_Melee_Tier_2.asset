@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f9e302ee42744f2bb3c05d737b83ebc, type: 3}
-  m_Name: SO_ItemConfig_Chest_Gold
+  m_Name: SO_ItemConfig_Weapon_Melee_Tier_2
   m_EditorClassIdentifier: 
-  itemName: Gold Chest
-  icon: {fileID: 21300000, guid: 2a5f8d91ededf1246953c054c01f8a6e, type: 3}
+  itemName: MELEE T2
+  icon: {fileID: 21300000, guid: 413a69e934cc705449cffe0f9858d7c1, type: 3}
   isBomb: 0
+  isCurrency: 0

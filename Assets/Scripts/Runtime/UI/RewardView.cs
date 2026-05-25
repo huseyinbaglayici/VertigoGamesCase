@@ -15,6 +15,7 @@ namespace Runtime.UI
         [SerializeField] private Transform _content;
         [SerializeField] private RewardItemView _itemPrefab;
         [SerializeField] private Button _collectButton;
+        [SerializeField] private Transform _effectImage;
 
         private IInventoryManager _inventoryManager;
         private ICurrencyManager _currencyManager;
@@ -73,6 +74,7 @@ namespace Runtime.UI
                 Destroy(child.gameObject);
 
             gameObject.SetActive(true);
+            PlayBreathAnimation();
 
             int index = 0;
             foreach (var item in _inventoryManager.GetItems())
@@ -93,9 +95,20 @@ namespace Runtime.UI
             }
         }
 
+        private void PlayBreathAnimation()
+        {
+            if (_effectImage == null) return;
+            _effectImage.DOKill();
+            _effectImage.localScale = Vector3.one;
+            _effectImage.DOScale(1.06f, 1.2f)
+                .SetEase(Ease.InOutSine)
+                .SetLoops(-1, LoopType.Yoyo);
+        }
+
         private void HandleReset()
         {
             foreach (Transform child in _content) Destroy(child.gameObject);
+            if (_effectImage != null) _effectImage.DOKill();
             gameObject.SetActive(false);
         }
 

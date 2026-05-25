@@ -16,7 +16,7 @@ MonoBehaviour:
   idleEase: 1
   introDuration: 0.5
   introEase: 27
-  spinDuration: 3
+  spinDuration: 3.2
   spinExtraRotations: 2
   spinCurve:
     serializedVersion: 2

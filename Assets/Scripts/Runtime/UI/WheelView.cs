@@ -71,6 +71,7 @@ namespace Runtime.UI
             _zoneManager.OnGameCompleted += HandleGameCompleted;
             _signalBus.Subscribe<GameRestartSignal>(HandleReset);
             _signalBus.Subscribe<RewardFlyCompleteSignal>(GoIdle);
+            _signalBus.Subscribe<GoldZoneAcknowledgedSignal>(HandleGoldZoneAcknowledged);
             yield return null;
             RefreshSlotData();
             _transition.OnOpened += PlayIntro;
@@ -96,6 +97,7 @@ namespace Runtime.UI
             {
                 _signalBus.Unsubscribe<GameRestartSignal>(HandleReset);
                 _signalBus.Unsubscribe<RewardFlyCompleteSignal>(GoIdle);
+                _signalBus.Unsubscribe<GoldZoneAcknowledgedSignal>(HandleGoldZoneAcknowledged);
             }
 
             StopHaptic();
@@ -220,6 +222,17 @@ namespace Runtime.UI
             RefreshSlotData();
             SetSpinning(false);
             StartIdleAnimation();
+
+            if (!_gameCompleted && _zoneManager.GetZoneType(_zoneManager.CurrentZone) == ZoneType.Gold)
+            {
+                _spinButton.interactable = false;
+                _signalBus.Fire<GoldZoneEnteredSignal>();
+            }
+        }
+
+        private void HandleGoldZoneAcknowledged()
+        {
+            if (!_isSpinning) _spinButton.interactable = true;
         }
 
         private void StartIdleAnimation()

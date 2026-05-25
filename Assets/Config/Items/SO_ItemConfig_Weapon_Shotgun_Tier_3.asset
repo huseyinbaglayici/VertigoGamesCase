@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f9e302ee42744f2bb3c05d737b83ebc, type: 3}
-  m_Name: SO_ItemConfig_Cash
+  m_Name: SO_ItemConfig_Weapon_Shotgun_Tier_3
   m_EditorClassIdentifier: 
-  itemName: Cash
-  icon: {fileID: 21300000, guid: 91599f05d5e295b4a8291fa8a41176d4, type: 3}
+  itemName: SHOTGUN  T3
+  icon: {fileID: 21300000, guid: be6a8aa6562c3bb40a6e8b66d1e3cdc9, type: 3}
   isBomb: 0
+  isCurrency: 0

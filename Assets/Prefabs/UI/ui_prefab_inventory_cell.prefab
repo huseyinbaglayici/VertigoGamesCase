@@ -99,7 +99,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 36
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -186,9 +186,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63fbfb6ea0f8e9e46964f4bbd9d5bb06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _countDuration: 0.5
   _icon: {fileID: 2225662304803988565}
   _amountText: {fileID: 2225662304098629831}
+  _spawnDuration: 0.35
+  _spawnEase: 27
+  _countDuration: 0.5
+  _countEase: 6
+  _bounceStrength: 0.2
+  _bounceDuration: 0.3
+  _bounceVibrato: 5
+  _bounceElastic: 0.5
 --- !u!1 &2225662304803988567
 GameObject:
   m_ObjectHideFlags: 0

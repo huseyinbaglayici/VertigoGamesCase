@@ -60,6 +60,13 @@ namespace Runtime.Core
             {
                 if (!_excludedSlots.Contains(i)) pool.Add(i);
             }
+
+            if (pool.Count == 0)
+            {
+                _excludedSlots.Clear();
+                return _random.Next(0, rewards.Length);
+            }
+
             return pool[_random.Next(0, pool.Count)];
         }
 

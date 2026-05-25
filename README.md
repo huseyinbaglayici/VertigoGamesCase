@@ -1,4 +1,4 @@
-# BOLD — Vertigo Games Case Study
+# Vertigo Games Case Study
 
 [Gameplay Video](https://drive.google.com/file/d/1oHRn95ikZEJHzMEvNrYq00Pv1fPsbzdo/view?usp=sharing)
 

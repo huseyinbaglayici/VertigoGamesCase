@@ -23,7 +23,7 @@ namespace Runtime.UI
         private AudioService _audioService;
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
-        private SO_RewardAnimationConfig.ItemPopIn    _cfg;
+        private SO_RewardAnimationConfig.ItemPopIn _cfg;
         private SO_RewardAnimationConfig.ItemSpreadBurst _itemCfg;
 
         private const string CollectButtonName = "ui_button_reward_exit";
@@ -33,7 +33,10 @@ namespace Runtime.UI
             if (_collectButton != null) return;
             foreach (var button in GetComponentsInChildren<Button>(true))
                 if (button.gameObject.name == CollectButtonName)
-                { _collectButton = button; break; }
+                {
+                    _collectButton = button;
+                    break;
+                }
         }
 
         [Inject]
@@ -100,7 +103,8 @@ namespace Runtime.UI
         {
             int total = 0;
             foreach (var item in _inventoryManager.GetItems())
-                if (item.Config.isCurrency) total += item.Amount;
+                if (item.Config.isCurrency)
+                    total += item.Amount;
             if (total > 0) _currencyManager.Collect(total);
 
             _audioService.PlayCollectSfx();

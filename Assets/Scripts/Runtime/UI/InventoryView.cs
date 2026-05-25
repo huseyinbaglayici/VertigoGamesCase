@@ -55,6 +55,7 @@ namespace Runtime.UI
             _spinManager.OnSpinCompleted += OnSpinEnded;
             _spinManager.OnGameResumed += OnSpinResumed;
             _signalBus.Subscribe<GameRestartSignal>(HandleReset);
+            _signalBus.Subscribe<ScrollToItemRequestSignal>(OnScrollRequest);
             _exitButton.onClick.AddListener(OnExitClicked);
         }
 
@@ -69,7 +70,11 @@ namespace Runtime.UI
             }
 
             if (_signalBus != null)
+            {
                 _signalBus.Unsubscribe<GameRestartSignal>(HandleReset);
+                _signalBus.Unsubscribe<ScrollToItemRequestSignal>(OnScrollRequest);
+            }
+
             _exitButton.onClick.RemoveListener(OnExitClicked);
         }
 
@@ -77,6 +82,7 @@ namespace Runtime.UI
         private void OnSpinEnded(RewardEntry _) => _exitButton.interactable = true;
 
         private void OnSpinResumed() => _exitButton.interactable = true;
+
         private void OnExitClicked()
         {
             _spinManager.RequestRewards();
@@ -98,7 +104,13 @@ namespace Runtime.UI
             }
         }
 
-        public void ScrollToItem(SO_ItemConfig config, float duration, Action<Vector3> onComplete)
+        private void OnScrollRequest(ScrollToItemRequestSignal signal)
+        {
+            ScrollToItem(signal.Config, signal.Duration,
+                pos => _signalBus.Fire(new ScrollToItemCompleteSignal { WorldPosition = pos }));
+        }
+
+        private void ScrollToItem(SO_ItemConfig config, float duration, Action<Vector3> onComplete)
         {
             if (!_itemViews.TryGetValue(config, out var view))
             {

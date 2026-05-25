@@ -12,7 +12,14 @@ namespace Runtime.UI
         [SerializeField] private TextMeshProUGUI stageText;
         [SerializeField] private Image backgroundImage;
 
+        private const float ActivateStrength = 0.35f;
+        private const float ActivateDuration = 0.4f;
+        private const int ActivateVibrato = 5;
+        private const float ActivateElastic = 0.5f;
+        private const Ease FadeEase = Ease.InQuad;
         private const float PassedAlpha = 0.3f;
+
+        [SerializeField] private float _fadeDuration = 0.4f;
 
         private Tween _fadeTween;
         private Tween _activateTween;
@@ -37,23 +44,23 @@ namespace Runtime.UI
         public void Activate()
         {
             _activateTween?.Kill();
-            _activateTween = stageText.transform.DOPunchScale(Vector3.one * 0.35f, 0.4f, 5, 0.5f);
+            _activateTween = stageText.transform.DOPunchScale(
+                Vector3.one * ActivateStrength, ActivateDuration, ActivateVibrato, ActivateElastic);
         }
 
-        public void FadeOutToPassed()
-        {
-            _fadeTween?.Kill();
-            Color c = stageText.color;
-            c.a = PassedAlpha;
-            _fadeTween = DOVirtual.Color(stageText.color, c, 0.4f, x => stageText.color = x).SetEase(Ease.InQuad);
-        }
+        public void FadeOutToPassed() => FadeTo(PassedAlpha, _fadeDuration);
+        public void Restore() => FadeTo(1f);
 
-        public void Restore()
+        private void FadeTo(float targetAlpha, float duration = 0f)
         {
             _fadeTween?.Kill();
-            Color c = stageText.color;
-            c.a = 1f;
-            stageText.color = c;
+            Color target = stageText.color;
+            target.a = targetAlpha;
+            if (duration > 0f)
+                _fadeTween = DOVirtual.Color(stageText.color, target, duration, x => stageText.color = x)
+                    .SetEase(FadeEase);
+            else
+                stageText.color = target;
         }
 
         private void OnDestroy()

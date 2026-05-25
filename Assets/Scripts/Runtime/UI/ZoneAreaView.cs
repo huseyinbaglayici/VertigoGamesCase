@@ -17,8 +17,6 @@ namespace Runtime.UI
 
         private IZoneManager _zoneManager;
         private SO_GameConfig _gameConfig;
-        private string _silverLabel;
-        private string _goldLabel;
 
         private void OnValidate()
         {
@@ -34,8 +32,6 @@ namespace Runtime.UI
         {
             _zoneManager = zoneManager;
             _gameConfig = gameConfig;
-            _silverLabel = gameConfig.stageConfig.silverAreaLabel;
-            _goldLabel = gameConfig.stageConfig.goldAreaLabel;
         }
 
         private void Start()
@@ -52,11 +48,10 @@ namespace Runtime.UI
 
         private void UpdateTexts(int zone)
         {
-            int nextSilver = GetNextZoneOfType(zone, ZoneType.Silver);
-            int nextGold = GetNextZoneOfType(zone, ZoneType.Gold);
-
-            _silverText.text = nextSilver > 0 ? $"{_silverLabel} {nextSilver}" : string.Empty;
-            _goldText.text = nextGold > 0 ? $"{_goldLabel} {nextGold}" : string.Empty;
+            _silverText.text = FormatZoneText(_gameConfig.stageConfig.silverAreaLabel,
+                GetNextZoneOfType(zone, ZoneType.Silver));
+            _goldText.text = FormatZoneText(_gameConfig.stageConfig.goldAreaLabel,
+                GetNextZoneOfType(zone, ZoneType.Gold));
         }
 
         private int GetNextZoneOfType(int currentZone, ZoneType type)
@@ -66,5 +61,8 @@ namespace Runtime.UI
                     return z;
             return 0;
         }
+
+        private static string FormatZoneText(string label, int next) =>
+            next > 0 ? $"{label} {next}" : string.Empty;
     }
 }

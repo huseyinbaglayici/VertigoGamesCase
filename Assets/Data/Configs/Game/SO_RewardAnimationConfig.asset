@@ -17,8 +17,8 @@ MonoBehaviour:
     interval: 0.08
     ease: 27
   particleScatterFly:
-    spreadRadius: 30
-    scatterDuration: 0.2
+    spreadRadius: 45
+    scatterDuration: 0.15
     scatterEase: 27
     jumpHeight: 70
     jumpDuration: 0.25

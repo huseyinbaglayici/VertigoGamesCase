@@ -4,7 +4,12 @@ namespace Runtime.Utility
 {
     public static class HapticFeedback
     {
-        public enum HapticType { Light, Medium, Heavy }
+        public enum HapticType
+        {
+            Light,
+            Medium,
+            Heavy
+        }
 
 #if UNITY_ANDROID && !UNITY_EDITOR
         private static AndroidJavaObject _vibrator;

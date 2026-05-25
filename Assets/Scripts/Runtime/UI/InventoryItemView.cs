@@ -9,11 +9,19 @@ namespace Runtime.UI
 {
     public class InventoryItemView : MonoBehaviour
     {
-        [SerializeField] private float _countDuration = 0.5f;
-
         [SerializeField] private Image _icon;
         [SerializeField] private TextMeshProUGUI _amountText;
-        private const float SpawnDuration = 0.35f;
+
+        [Header("Spawn")] [SerializeField] private float _spawnDuration = 0.35f;
+        [SerializeField] private Ease _spawnEase = Ease.OutBack;
+
+        [Header("Count")] [SerializeField] private float _countDuration = 0.5f;
+        [SerializeField] private Ease _countEase = Ease.OutQuad;
+
+        [Header("Bounce")] [SerializeField] private float _bounceStrength = 0.2f;
+        [SerializeField] private float _bounceDuration = 0.3f;
+        [SerializeField] private int _bounceVibrato = 5;
+        [SerializeField] private float _bounceElastic = 0.5f;
 
         public event Action OnBounced;
 
@@ -24,7 +32,7 @@ namespace Runtime.UI
 
         public float SpawnRemainingTime =>
             _spawnTween != null && _spawnTween.IsActive()
-                ? Mathf.Max(0f, SpawnDuration - (float)_spawnTween.Elapsed())
+                ? Mathf.Max(0f, _spawnDuration - _spawnTween.Elapsed())
                 : 0f;
 
         public void Init(ItemData item)
@@ -38,8 +46,8 @@ namespace Runtime.UI
         public void PlaySpawnAnimation()
         {
             transform.localScale = Vector3.zero;
-            _spawnTween = transform.DOScale(Vector3.one, SpawnDuration)
-                .SetEase(Ease.OutBack)
+            _spawnTween = transform.DOScale(Vector3.one, _spawnDuration)
+                .SetEase(_spawnEase)
                 .OnComplete(() => AnimateToAmount(_targetAmount));
         }
 
@@ -47,17 +55,15 @@ namespace Runtime.UI
         {
             OnBounced?.Invoke();
             _countTween?.Kill();
-            _countTween = DOTween.To(
-                () => _displayedAmount,
-                x =>
-                {
-                    _displayedAmount = x;
-                    _amountText.text = $"{x}";
-                },
-                targetAmount,
-                _countDuration
-            ).SetEase(Ease.OutQuad);
-            transform.DOPunchScale(Vector3.one * 0.2f, 0.3f, 5, 0.5f);
+            _countTween = DOTween.To(() => _displayedAmount, SetDisplayedAmount, targetAmount, _countDuration)
+                .SetEase(_countEase);
+            transform.DOPunchScale(Vector3.one * _bounceStrength, _bounceDuration, _bounceVibrato, _bounceElastic);
+        }
+
+        private void SetDisplayedAmount(int value)
+        {
+            _displayedAmount = value;
+            _amountText.text = value.ToString();
         }
 
         public Vector3 GetIconWorldCenter() =>

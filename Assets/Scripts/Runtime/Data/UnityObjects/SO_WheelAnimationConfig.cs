@@ -8,6 +8,7 @@ namespace Runtime.Data.UnityObjects
     public class SO_WheelAnimationConfig : ScriptableObjectInstaller
     {
         public float          idleRotationDuration = 40f;
+        public Ease           idleEase             = Ease.Linear;
         public float          introDuration        = 0.5f;
         public Ease           introEase            = Ease.OutBack;
         public float          spinDuration         = 4f;

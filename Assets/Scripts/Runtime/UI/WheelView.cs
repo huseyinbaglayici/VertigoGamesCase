@@ -23,6 +23,8 @@ namespace Runtime.UI
         [SerializeField] private WheelSlotView[] _slotViews;
 
         private const float IndicatorAngle = 90f;
+        private const float MinSpinDistance = 10f;
+        private const float FullRotation = 360f;
 
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
@@ -41,7 +43,8 @@ namespace Runtime.UI
 
         [Inject]
         public void Construct(ISpinManager spinManager, IZoneManager zoneManager, SO_GameConfig gameConfig,
-            SO_WheelAnimationConfig animConfig, SceneTransitionView transition, SignalBus signalBus, AudioService audioService)
+            SO_WheelAnimationConfig animConfig, SceneTransitionView transition, SignalBus signalBus,
+            AudioService audioService)
         {
             _spinManager = spinManager;
             _zoneManager = zoneManager;
@@ -86,6 +89,7 @@ namespace Runtime.UI
                 _spinManager.OnSpinDecision -= HandleSpinDecision;
                 _spinManager.OnGameResumed -= HandleGameResumed;
             }
+
             if (_zoneManager != null) _zoneManager.OnGameCompleted -= HandleGameCompleted;
             if (_transition != null) _transition.OnOpened -= PlayIntro;
             if (_signalBus != null)
@@ -93,7 +97,8 @@ namespace Runtime.UI
                 _signalBus.Unsubscribe<GameRestartSignal>(HandleReset);
                 _signalBus.Unsubscribe<RewardFlyCompleteSignal>(GoIdle);
             }
-            if (_hapticCoroutine != null) { StopCoroutine(_hapticCoroutine); _hapticCoroutine = null; }
+
+            StopHaptic();
             transform.DOKill();
             _wheelContent.DOKill();
         }
@@ -113,48 +118,55 @@ namespace Runtime.UI
         private void HandleSpinDecision(int slotIndex, RewardEntry result)
         {
             _wheelContent.DOKill();
-            if (_hapticCoroutine != null) { StopCoroutine(_hapticCoroutine); _hapticCoroutine = null; }
+            StopHaptic();
 
             bool isBomb = result.item.isBomb;
             _hapticCoroutine = StartCoroutine(SpinHapticCoroutine());
 
-            _wheelContent.DORotate(new Vector3(0f, 0f, -ComputeCwDistance(slotIndex)), _animCfg.spinDuration, RotateMode.FastBeyond360)
+            _wheelContent.DORotate(new Vector3(0f, 0f, -ComputeCwDistance(slotIndex)), _animCfg.spinDuration,
+                    RotateMode.FastBeyond360)
                 .SetRelative()
                 .SetEase(_animCfg.spinCurve)
-                .OnComplete(() =>
-                {
-                    if (_hapticCoroutine != null) { StopCoroutine(_hapticCoroutine); _hapticCoroutine = null; }
+                .OnComplete(() => OnSpinComplete(slotIndex, result, isBomb));
+        }
 
-                    HapticFeedback.Play(isBomb
-                        ? HapticFeedback.HapticType.Heavy
-                        : HapticFeedback.HapticType.Medium);
+        private void OnSpinComplete(int slotIndex, RewardEntry result, bool isBomb)
+        {
+            StopHaptic();
+            HapticFeedback.Play(isBomb ? HapticFeedback.HapticType.Heavy : HapticFeedback.HapticType.Medium);
 
-                    if (isBomb)
-                    {
-                        _audioService.PlayBombSfx();
-                        _slotViews[slotIndex].SetSafe();
-                    }
-                    else
-                    {
-                        bool isGold = _zoneManager.GetZoneType(_zoneManager.CurrentZone) == ZoneType.Gold;
-                        if (isGold) _audioService.PlayGoldRewardSfx();
-                        else _audioService.PlayRewardSfx();
-                    }
+            if (isBomb)
+            {
+                _audioService.PlayBombSfx();
+                _slotViews[slotIndex].SetSafe();
+            }
+            else
+            {
+                bool isGold = _zoneManager.GetZoneType(_zoneManager.CurrentZone) == ZoneType.Gold;
+                if (isGold) _audioService.PlayGoldRewardSfx();
+                else _audioService.PlayRewardSfx();
+            }
 
-                    _spinManager.CommitSpinResult();
-                    if (isBomb || _gameCompleted) return;
+            _spinManager.CommitSpinResult();
+            if (isBomb || _gameCompleted) return;
 
-                    _signalBus.Fire(new RewardReadyToFlySignal
-                    {
-                        SlotTransform = _slotViews[slotIndex].transform,
-                        Entry = result
-                    });
-                });
+            _signalBus.Fire(new RewardReadyToFlySignal
+            {
+                SlotTransform = _slotViews[slotIndex].transform,
+                Entry = result
+            });
+        }
+
+        private void StopHaptic()
+        {
+            if (_hapticCoroutine == null) return;
+            StopCoroutine(_hapticCoroutine);
+            _hapticCoroutine = null;
         }
 
         private IEnumerator SpinHapticCoroutine()
         {
-            float slotStep = 360f / _slotViews.Length;
+            float slotStep = FullRotation / _slotViews.Length;
             float accumulated = 0f;
             float nextThreshold = slotStep;
             float prevAngle = _wheelContent.eulerAngles.z;
@@ -182,10 +194,10 @@ namespace Runtime.UI
                 _slotViews[slotIndex].transform.localPosition.y,
                 _slotViews[slotIndex].transform.localPosition.x) * Mathf.Rad2Deg;
 
-            float targetZ = ((IndicatorAngle - slotAngle) % 360f + 360f) % 360f;
+            float targetZ = ((IndicatorAngle - slotAngle) % FullRotation + FullRotation) % FullRotation;
             float cwDistance = _wheelContent.eulerAngles.z - targetZ;
-            if (cwDistance < 10f) cwDistance += 360f;
-            return cwDistance + _animCfg.spinExtraRotations * 360f;
+            if (cwDistance < MinSpinDistance) cwDistance += FullRotation;
+            return cwDistance + _animCfg.spinExtraRotations * FullRotation;
         }
 
         #endregion
@@ -203,6 +215,8 @@ namespace Runtime.UI
 
         private void GoIdle()
         {
+            _wheelContent.DOKill();
+            _wheelContent.localRotation = Quaternion.identity;
             RefreshSlotData();
             SetSpinning(false);
             StartIdleAnimation();
@@ -211,9 +225,10 @@ namespace Runtime.UI
         private void StartIdleAnimation()
         {
             if (_isSpinning) return;
-            _wheelContent.DORotate(new Vector3(0f, 0f, -360f), _animCfg.idleRotationDuration, RotateMode.FastBeyond360)
+            _wheelContent.DORotate(new Vector3(0f, 0f, -FullRotation), _animCfg.idleRotationDuration,
+                    RotateMode.FastBeyond360)
                 .SetRelative()
-                .SetEase(Ease.Linear)
+                .SetEase(_animCfg.idleEase)
                 .SetLoops(-1, LoopType.Incremental);
         }
 

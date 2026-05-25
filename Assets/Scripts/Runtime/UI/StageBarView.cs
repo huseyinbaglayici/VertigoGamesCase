@@ -122,7 +122,8 @@ namespace Runtime.UI
 
         private void PunchFrame()
         {
-            _currentStageFrame.DOPunchScale(new Vector3(_punchScale, _punchScale * 0.5f, 0f), _punchDuration, _punchVibrato, _punchElasticity);
+            _currentStageFrame.DOPunchScale(new Vector3(_punchScale, _punchScale * 0.5f, 0f), _punchDuration,
+                _punchVibrato, _punchElasticity);
         }
     }
 }

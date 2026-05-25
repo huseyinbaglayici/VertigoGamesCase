@@ -9,6 +9,8 @@ namespace Runtime.UI
     {
         [SerializeField] private WheelCellView _cell;
 
+        private const string SafeLabel = "SAFE";
+
         private Image _iconImage;
         private TextMeshProUGUI _amountText;
 
@@ -27,21 +29,29 @@ namespace Runtime.UI
         public void Setup(RewardEntry entry, int currentZone, int totalZones)
         {
             _iconImage.sprite = entry.item.icon;
-            _iconImage.color = Color.white;
+
             if (entry.item.isBomb)
             {
-                _amountText.text = string.Empty;
+                SetDisplay(Color.white, string.Empty);
                 return;
             }
-            int amount = Mathf.RoundToInt(Mathf.Lerp(entry.minAmount, entry.maxAmount,
-                (float)(currentZone - 1) / (totalZones - 1)));
-            _amountText.text = $"x{amount}";
+
+            int amount = CalculateAmount(entry, currentZone, totalZones);
+            SetDisplay(Color.white, $"x{amount}");
         }
 
-        public void SetSafe()
+        public void SetSafe() => SetDisplay(Color.gray, SafeLabel);
+
+        private void SetDisplay(Color color, string text)
         {
-            _iconImage.color = Color.gray;
-            _amountText.text = "SAFE";
+            _iconImage.color = color;
+            _amountText.text = text;
+        }
+
+        private static int CalculateAmount(RewardEntry entry, int currentZone, int totalZones)
+        {
+            float t = (float)(currentZone - 1) / (totalZones - 1);
+            return Mathf.RoundToInt(Mathf.Lerp(entry.minAmount, entry.maxAmount, t));
         }
     }
 }

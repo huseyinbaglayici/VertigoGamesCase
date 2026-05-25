@@ -7,7 +7,6 @@ namespace Runtime.Installers
 {
     public class GameInstaller : MonoInstaller
     {
-
         public override void InstallBindings()
         {
             DOTween.Init();
@@ -15,6 +14,8 @@ namespace Runtime.Installers
             Container.DeclareSignal<GameRestartSignal>();
             Container.DeclareSignal<RewardReadyToFlySignal>();
             Container.DeclareSignal<RewardFlyCompleteSignal>();
+            Container.DeclareSignal<ScrollToItemRequestSignal>();
+            Container.DeclareSignal<ScrollToItemCompleteSignal>();
             CoreInstaller.Install(Container);
         }
     }

@@ -23,7 +23,11 @@ namespace Runtime.UI
             _canvasGroup.alpha = 1f;
             _canvasGroup.DOFade(0f, _fadeDuration)
                 .SetEase(Ease.InQuad)
-                .OnComplete(() => { HasOpened = true; OnOpened?.Invoke(); });
+                .OnComplete(() =>
+                {
+                    HasOpened = true;
+                    OnOpened?.Invoke();
+                });
         }
 
         public void FadeAndLoad()

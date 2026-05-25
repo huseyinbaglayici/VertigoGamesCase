@@ -12,25 +12,30 @@ namespace Runtime.UI
         [SerializeField] private Image[] _particles;
 
         private SO_RewardAnimationConfig.ParticleScatterFly _cfg;
-        private InventoryView _inventoryView;
         private SignalBus _signalBus;
 
         [Inject]
-        public void Construct(InventoryView inventoryView, SignalBus signalBus, SO_RewardAnimationConfig animConfig)
+        public void Construct(SignalBus signalBus, SO_RewardAnimationConfig animConfig)
         {
-            _inventoryView = inventoryView;
             _signalBus = signalBus;
             _cfg = animConfig.particleScatterFly;
             _signalBus.Subscribe<RewardReadyToFlySignal>(OnRewardReadyToFly);
+            _signalBus.Subscribe<ScrollToItemCompleteSignal>(OnScrollComplete);
         }
 
         private void OnDestroy()
         {
-            _signalBus?.Unsubscribe<RewardReadyToFlySignal>(OnRewardReadyToFly);
+            if (_signalBus != null)
+            {
+                _signalBus.Unsubscribe<RewardReadyToFlySignal>(OnRewardReadyToFly);
+                _signalBus.Unsubscribe<ScrollToItemCompleteSignal>(OnScrollComplete);
+            }
+
             foreach (var p in _particles) p.transform.DOKill();
         }
 
         private void OnRewardReadyToFly(RewardReadyToFlySignal signal) => Play(signal.SlotTransform, signal.Entry);
+        private void OnScrollComplete(ScrollToItemCompleteSignal signal) => FlyTo(signal.WorldPosition);
 
         private void Play(Transform slotTransform, RewardEntry entry)
         {
@@ -54,10 +59,10 @@ namespace Runtime.UI
                     .SetEase(_cfg.scatterEase);
             }
 
-            _inventoryView.ScrollToItem(entry.item, _cfg.scrollDuration, FlyTo);
+            _signalBus.Fire(new ScrollToItemRequestSignal { Config = entry.item, Duration = _cfg.scrollDuration });
         }
 
-        private void FlyTo(Vector3 worldTarget)
+        private void FlyTo(Vector3 worldTarget = default)
         {
             Vector3 localTarget = transform.InverseTransformPoint(worldTarget);
             int flyCompleted = 0;

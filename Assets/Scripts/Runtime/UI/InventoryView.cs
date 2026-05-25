@@ -20,8 +20,8 @@ namespace Runtime.UI
         [SerializeField] private GameObject _itemPrefab;
         [SerializeField] private Button _exitButton;
 
-        private const string ExitButtonName      = "ui_button_inventory_exit";
-        private const float  ViewportCenterRatio = 0.5f;
+        private const string ExitButtonName = "ui_button_inventory_exit";
+        private const float ViewportCenterRatio = 0.5f;
 
         private IInventoryManager _inventoryManager;
         private ISpinManager _spinManager;
@@ -89,8 +89,8 @@ namespace Runtime.UI
         #region Item Management
 
         private void OnSpinStarted(int _, RewardEntry __) => _exitButton.interactable = false;
-        private void OnSpinEnded(RewardEntry _)           => _exitButton.interactable = true;
-        private void OnSpinResumed()                      => _exitButton.interactable = true;
+        private void OnSpinEnded(RewardEntry _) => _exitButton.interactable = true;
+        private void OnSpinResumed() => _exitButton.interactable = true;
 
         private void OnExitClicked()
         {
@@ -181,7 +181,8 @@ namespace Runtime.UI
             if (scrollable <= 0f) return 1f;
 
             float itemLocalY = contentRect.InverseTransformPoint(item.position).y;
-            float offset = Mathf.Clamp(-itemLocalY - _scrollRect.viewport.rect.height * ViewportCenterRatio, 0f, scrollable);
+            float offset = Mathf.Clamp(-itemLocalY - _scrollRect.viewport.rect.height * ViewportCenterRatio, 0f,
+                scrollable);
             return 1f - offset / scrollable;
         }
 

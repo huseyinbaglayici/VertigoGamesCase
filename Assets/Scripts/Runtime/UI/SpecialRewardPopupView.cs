@@ -19,17 +19,19 @@ namespace Runtime.UI
         [SerializeField] private Transform _effectImage;
 
         private const string ContinueButtonName = "ui_button_reward_collect";
+        private const float ShowDelay = 1f;
 
         private const float BreathTargetScale = 1.06f;
-        private const float BreathDuration    = 1.2f;
-        private const float FlipYMaxAngle     = 25f;
-        private const float FlipYDuration     = 2.5f;
-        private const float FlipXMaxAngle     = 8f;
-        private const float FlipXDuration     = 1.8f;
+        private const float BreathDuration = 1.2f;
+        private const float FlipYMaxAngle = 25f;
+        private const float FlipYDuration = 2.5f;
+        private const float FlipXMaxAngle = 8f;
+        private const float FlipXDuration = 1.8f;
 
         private SignalBus _signalBus;
         private SO_GameConfig _gameConfig;
         private IAudioService _audioService;
+        private Tween _showDelayTween;
 
         #endregion
 
@@ -68,6 +70,7 @@ namespace Runtime.UI
             }
 
             _collectButton.onClick.RemoveListener(OnContinueClicked);
+            _showDelayTween?.Kill();
             if (_effectImage != null) _effectImage.DOKill();
             if (_itemIcon != null) _itemIcon.transform.DOKill();
         }
@@ -88,6 +91,12 @@ namespace Runtime.UI
             if (_itemIcon != null) _itemIcon.sprite = item.icon;
             if (_itemNameText != null) _itemNameText.text = item.itemName;
 
+            _showDelayTween?.Kill();
+            _showDelayTween = DOVirtual.DelayedCall(ShowDelay, ShowImmediate);
+        }
+
+        private void ShowImmediate()
+        {
             gameObject.SetActive(true);
             PlayBreathAnimation();
             _audioService.PlaySpecialItemOpenSfx();
@@ -95,6 +104,7 @@ namespace Runtime.UI
 
         private void Hide()
         {
+            _showDelayTween?.Kill();
             if (_effectImage != null) _effectImage.DOKill();
             if (_itemIcon != null) _itemIcon.transform.DOKill();
             gameObject.SetActive(false);

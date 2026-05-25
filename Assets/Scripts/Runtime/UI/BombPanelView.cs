@@ -19,10 +19,11 @@ namespace Runtime.UI
 
         private TextMeshProUGUI _continueButtonText;
 
-        [Header("Show / Hide Animation")]
-        [SerializeField] private float _showDuration = 0.4f;
-        [SerializeField] private Ease  _showEase     = Ease.OutBack;
-        [SerializeField] private Ease  _hideEase     = Ease.InBack;
+        [Header("Show / Hide Animation")] [SerializeField]
+        private float _showDuration = 0.4f;
+
+        [SerializeField] private Ease _showEase = Ease.OutBack;
+        [SerializeField] private Ease _hideEase = Ease.InBack;
 
         private ISpinManager _spinManager;
         private ICurrencyManager _currencyManager;
@@ -32,7 +33,7 @@ namespace Runtime.UI
         private int _continueCost;
 
         private const string ContinueButtonName = "ui_button_bomb_revive";
-        private const string ExitButtonName     = "ui_button_bomb_exit";
+        private const string ExitButtonName = "ui_button_bomb_giveup";
 
         #endregion
 

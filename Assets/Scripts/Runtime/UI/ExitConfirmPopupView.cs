@@ -28,6 +28,7 @@ namespace Runtime.UI
                 if (_collectButton == null && button.gameObject.name == CollectButtonName) _collectButton = button;
                 if (_goBackButton == null && button.gameObject.name == GoBackButtonName) _goBackButton = button;
             }
+
         }
 
         private SignalBus _signalBus;

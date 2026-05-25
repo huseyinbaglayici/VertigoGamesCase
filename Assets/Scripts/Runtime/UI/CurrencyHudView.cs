@@ -9,6 +9,8 @@ namespace Runtime.UI
     {
         [SerializeField] private TextMeshProUGUI _currencyText;
 
+        private const string CurrencyFormat = "N0";
+
         private ICurrencyManager _currencyManager;
 
         [Inject]
@@ -24,6 +26,6 @@ namespace Runtime.UI
             if (_currencyManager != null) _currencyManager.OnCurrencyChanged -= Refresh;
         }
 
-        private void Refresh(int currency) => _currencyText.text = currency.ToString("N0");
+        private void Refresh(int currency) => _currencyText.text = currency.ToString(CurrencyFormat);
     }
 }

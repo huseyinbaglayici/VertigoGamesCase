@@ -6,7 +6,6 @@ namespace Runtime.Data.UnityObjects
     [CreateAssetMenu(fileName = "AudioConfig", menuName = "Game/Audio Config")]
     public class SO_AudioConfig : ScriptableObjectInstaller
     {
-        public AudioClip spinClip;
         public AudioClip spinTickClip;
         public AudioClip rewardClip;
         public AudioClip goldRewardClip;

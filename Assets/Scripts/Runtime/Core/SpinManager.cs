@@ -95,7 +95,7 @@ namespace Runtime.Core
             var result = _pendingResult;
             _pendingResult = null;
 
-            if (result.item.isBomb)
+            if (result.item.IsBomb)
             {
                 OnBombHit?.Invoke();
                 return;

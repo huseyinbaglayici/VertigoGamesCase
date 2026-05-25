@@ -14,5 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: BOMB
   icon: {fileID: 21300000, guid: 67e09674a2dcaa04382fb4d8bc57d9e6, type: 3}
-  isBomb: 1
-  isCurrency: 0
+  itemType: 1

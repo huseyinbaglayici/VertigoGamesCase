@@ -14,16 +14,18 @@ namespace Runtime.Utility
 #if UNITY_ANDROID && !UNITY_EDITOR
         private const int MinApiLevelForVibrationEffect = 26;
 
-        private const int LightDurationMs  = 12;
+        private const int LightDurationMs = 12;
         private const int MediumDurationMs = 40;
-        private const int HeavyDurationMs  = 80;
+        private const int HeavyDurationMs = 80;
 
-        private const int LightAmplitude  = 35;
+        private const int LightAmplitude = 35;
         private const int MediumAmplitude = 150;
-        private const int HeavyAmplitude  = 255;
+        private const int HeavyAmplitude = 255;
+
+        private const int UninitializedApiLevel = -1;
 
         private static AndroidJavaObject _vibrator;
-        private static int _apiLevel = -1;
+        private static int _apiLevel = UninitializedApiLevel;
 
         private static AndroidJavaObject Vibrator
         {

@@ -11,7 +11,7 @@ namespace Runtime.Data.UnityObjects
         public int continueCost = 500;
         public SO_WheelConfig normalWheel;
         public SO_WheelConfig silverWheel;
-        public SO_WheelConfig goldWheel;
+        public SO_GoldWheelConfig goldWheel;
         public SO_StageConfig stageConfig;
 
         public override void InstallBindings()

@@ -52,13 +52,16 @@ namespace Runtime.UI
                 Vector3 scatterLocal = slotLocal + new Vector3(
                     Mathf.Cos(angle) * _cfg.spreadRadius,
                     Mathf.Sin(angle) * _cfg.spreadRadius, 0f);
+                Vector3 jumpLocal = scatterLocal + Vector3.up * _cfg.jumpHeight;
 
                 _particles[i].transform.DOKill();
                 _particles[i].sprite = entry.item.icon;
                 _particles[i].transform.localPosition = slotLocal;
 
-                _particles[i].transform.DOLocalMove(scatterLocal, _cfg.scatterDuration)
-                    .SetEase(_cfg.scatterEase);
+                DOTween.Sequence()
+                    .Append(_particles[i].transform.DOLocalMove(scatterLocal, _cfg.scatterDuration)
+                        .SetEase(_cfg.scatterEase))
+                    .Append(_particles[i].transform.DOLocalMove(jumpLocal, _cfg.jumpDuration).SetEase(Ease.OutQuad));
             }
 
             _signalBus.Fire(new ScrollToItemRequestSignal { Config = entry.item, Duration = _cfg.scrollDuration });
@@ -72,20 +75,21 @@ namespace Runtime.UI
             for (int i = 0; i < _particles.Length; i++)
             {
                 var particle = _particles[i];
-                float peakY = particle.transform.localPosition.y + _cfg.jumpHeight;
 
-                var seq = DOTween.Sequence().SetDelay(i * _cfg.flyStagger);
-                seq.Append(particle.transform.DOLocalMoveY(peakY, _cfg.jumpDuration).SetEase(Ease.OutQuad));
-                seq.Append(particle.transform.DOLocalMove(localTarget, _cfg.flyDuration).SetEase(_cfg.flyEase));
-                seq.OnComplete(() =>
-                {
-                    flyCompleted++;
-                    if (flyCompleted < _particles.Length) return;
-                    foreach (var p in _particles)
-                        p.transform.localPosition = Vector3.zero;
-                    _signalBus.Fire<RewardFlyCompleteSignal>();
-                    gameObject.SetActive(false);
-                });
+                particle.transform.DOKill();
+
+                DOTween.Sequence()
+                    .SetDelay(i * _cfg.flyStagger)
+                    .Append(particle.transform.DOLocalMove(localTarget, _cfg.flyDuration).SetEase(_cfg.flyEase))
+                    .OnComplete(() =>
+                    {
+                        flyCompleted++;
+                        if (flyCompleted < _particles.Length) return;
+                        foreach (var p in _particles)
+                            p.transform.localPosition = Vector3.zero;
+                        _signalBus.Fire<RewardFlyCompleteSignal>();
+                        gameObject.SetActive(false);
+                    });
             }
         }
     }

@@ -1,4 +1,6 @@
 namespace Runtime.Signals
 {
-    public class GoldZoneAcknowledgedSignal { }
+    public class GoldZoneAcknowledgedSignal
+    {
+    }
 }

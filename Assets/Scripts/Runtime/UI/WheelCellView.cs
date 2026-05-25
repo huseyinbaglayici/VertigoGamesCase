@@ -7,11 +7,11 @@ namespace Runtime.UI
 {
     public class WheelCellView : MonoBehaviour
     {
-        [FormerlySerializedAs("Icon")]
-        [SerializeField] private Image _icon;
+        [FormerlySerializedAs("Icon")] [SerializeField]
+        private Image _icon;
 
-        [FormerlySerializedAs("AmountText")]
-        [SerializeField] private TextMeshProUGUI _amountText;
+        [FormerlySerializedAs("AmountText")] [SerializeField]
+        private TextMeshProUGUI _amountText;
 
         public Image Icon => _icon;
         public TextMeshProUGUI AmountText => _amountText;

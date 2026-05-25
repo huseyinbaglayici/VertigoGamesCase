@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: SO_WheelAnimationConfig
   m_EditorClassIdentifier: 
   idleRotationDuration: 25
-  idleEase: 1
+  idleEase: 0
   introDuration: 0.5
-  introEase: 27
+  introEase: 26
   spinDuration: 3.2
   spinExtraRotations: 2
   spinCurve:

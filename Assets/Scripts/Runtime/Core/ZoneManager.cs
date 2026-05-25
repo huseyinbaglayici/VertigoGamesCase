@@ -29,7 +29,8 @@ namespace Runtime.Core
         public ZoneType GetZoneType(int zone)
         {
             if (_gameConfig.goldZoneInterval > 0 && zone % _gameConfig.goldZoneInterval == 0) return ZoneType.Gold;
-            if (zone == 1 || (_gameConfig.silverZoneInterval > 0 && zone % _gameConfig.silverZoneInterval == 0)) return ZoneType.Silver;
+            if (zone == 1 || (_gameConfig.silverZoneInterval > 0 && zone % _gameConfig.silverZoneInterval == 0))
+                return ZoneType.Silver;
             return ZoneType.Normal;
         }
 

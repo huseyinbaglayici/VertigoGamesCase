@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa96f210f0873e849ac3799435fa18f0, type: 3}
   m_Name: SO_AudioConfig
   m_EditorClassIdentifier: 
-  spinClip: {fileID: 8300000, guid: b8f1a93936336f54da29bf62b1282d4c, type: 3}
   spinTickClip: {fileID: 8300000, guid: 5f382366bad082b4ba8e0d68fefffcc8, type: 3}
   rewardClip: {fileID: 8300000, guid: fe5186ce0ca8aae4ab612c73b574c30c, type: 3}
   goldRewardClip: {fileID: 8300000, guid: f509cb519adc78649a2517de844a275e, type: 3}

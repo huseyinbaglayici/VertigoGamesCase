@@ -17,16 +17,16 @@ MonoBehaviour:
     interval: 0.08
     ease: 27
   particleScatterFly:
-    spreadRadius: 50
-    scatterDuration: 0.1
+    spreadRadius: 45
+    scatterDuration: 0.02
     scatterEase: 27
-    jumpHeight: 100
-    jumpDuration: 0.2
+    jumpHeight: 90
+    jumpDuration: 0.1
     scrollDuration: 0.2
-    flyDuration: 0.15
+    flyDuration: 0.12
     flyStagger: 0.05
     flyEase: 5
   itemSpreadBurst:
-    spreadRadius: 120
+    spreadRadius: 150
     spreadDuration: 0.2
     gatherDuration: 0.15

@@ -40,7 +40,7 @@ namespace Runtime.UI
             _icon.sprite = item.Config.icon;
             _displayedAmount = 0;
             _targetAmount = item.Amount;
-            _amountText.text = "0";
+            _amountText.text = _displayedAmount.ToString();
         }
 
         public void PlaySpawnAnimation()

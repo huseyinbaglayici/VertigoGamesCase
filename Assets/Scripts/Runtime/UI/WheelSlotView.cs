@@ -30,7 +30,7 @@ namespace Runtime.UI
         {
             _iconImage.sprite = entry.item.icon;
 
-            if (entry.item.isBomb)
+            if (entry.item.IsBomb)
             {
                 SetDisplay(Color.white, string.Empty);
                 return;

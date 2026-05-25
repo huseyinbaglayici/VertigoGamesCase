@@ -26,6 +26,11 @@ namespace Runtime.UI
         private const float MinSpinDistance = 10f;
         private const float FullRotation = 360f;
 
+        private const float SpinButtonPunchStrength = 0.1f;
+        private const float SpinButtonPunchDuration = 0.2f;
+        private const int SpinButtonPunchVibrato = 1;
+        private const float SpinButtonPunchElasticity = 0.3f;
+
         private ISpinManager _spinManager;
         private IZoneManager _zoneManager;
         private RewardCalculator _rewardCalculator;
@@ -115,7 +120,8 @@ namespace Runtime.UI
             HapticFeedback.Play(HapticFeedback.HapticType.Light);
             SetSpinning(true);
             transform.DOKill();
-            transform.DOPunchScale(Vector3.one * 0.1f, 0.2f, 1, 0.3f);
+            transform.DOPunchScale(Vector3.one * SpinButtonPunchStrength, SpinButtonPunchDuration,
+                SpinButtonPunchVibrato, SpinButtonPunchElasticity);
             _spinManager.Spin();
         }
 
@@ -124,7 +130,7 @@ namespace Runtime.UI
             _wheelContent.DOKill();
             StopHaptic();
 
-            bool isBomb = result.item.isBomb;
+            bool isBomb = result.item.IsBomb;
             _hapticCoroutine = StartCoroutine(SpinHapticCoroutine());
 
             _wheelContent.DORotate(new Vector3(0f, 0f, -ComputeCwDistance(slotIndex)), _animCfg.spinDuration,
@@ -286,7 +292,8 @@ namespace Runtime.UI
             for (int i = 0; i < _slotViews.Length; i++)
             {
                 var entry = rewardSet.rewards[i];
-                int amount = entry.item.isBomb ? 0
+                int amount = entry.item.IsBomb
+                    ? 0
                     : _rewardCalculator.Calculate(entry.minAmount, entry.maxAmount, _zoneManager.CurrentZone);
                 _slotViews[i].Setup(entry, amount);
             }

@@ -9,63 +9,37 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9462704a9a687b47a10890d081c1f3f, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f3e7b2d4c8a6f1e5b9d3c7f2a4e8b6d, type: 3}
   m_Name: SO_WheelConfig_Gold
   m_EditorClassIdentifier: 
   baseSprite: {fileID: 21300000, guid: 703f58c0552790a48a615b8571ea7706, type: 3}
   indicatorSprite: {fileID: 21300000, guid: 0435bfb23ea9e7c4787a98b6ccd60e81, type: 3}
   rewardSets:
   - rewards:
-    - item: {fileID: 11400000, guid: 121da31e534ea054495054bb4d30a718, type: 2}
+    - item: {fileID: 11400000, guid: 1b471790e5bc77a4ba86cb2b06ef7143, type: 2}
       minAmount: 20
       maxAmount: 50
     - item: {fileID: 11400000, guid: d0ec9c8cf697d534089353d46e18d3b0, type: 2}
-      minAmount: 11000
-      maxAmount: 15000
-    - item: {fileID: 11400000, guid: 7329497db35b6874f9233cd1ea289622, type: 2}
-      minAmount: 20
-      maxAmount: 50
-    - item: {fileID: 11400000, guid: a9d6a17dbdf827743a53bcd5715db989, type: 2}
+      minAmount: 100000
+      maxAmount: 200000
+    - item: {fileID: 11400000, guid: c07dd24ce9b200e46b4d6259e2708991, type: 2}
+      minAmount: 25
+      maxAmount: 45
+    - item: {fileID: 11400000, guid: c57528c5c3d3f0941a0a2bcb9c8f4533, type: 2}
+      minAmount: 1000
+      maxAmount: 2000
+    - item: {fileID: 11400000, guid: 1b471790e5bc77a4ba86cb2b06ef7143, type: 2}
       minAmount: 60
       maxAmount: 80
-    - item: {fileID: 11400000, guid: 206f3c5e449cd484185eba40e1ff1d7c, type: 2}
-      minAmount: 60
-      maxAmount: 80
+    - item: {fileID: 11400000, guid: d0ec9c8cf697d534089353d46e18d3b0, type: 2}
+      minAmount: 100000
+      maxAmount: 200000
+    - item: {fileID: 11400000, guid: c07dd24ce9b200e46b4d6259e2708991, type: 2}
+      minAmount: 25
+      maxAmount: 45
     - item: {fileID: 11400000, guid: c57528c5c3d3f0941a0a2bcb9c8f4533, type: 2}
       minAmount: 100
       maxAmount: 250
-    - item: {fileID: 11400000, guid: d0ec9c8cf697d534089353d46e18d3b0, type: 2}
-      minAmount: 10000
-      maxAmount: 12000
-    - item: {fileID: 11400000, guid: 2b7a362a552d52645823b82e0b101449, type: 2}
-      minAmount: 15
-      maxAmount: 35
-  - rewards:
-    - item: {fileID: 11400000, guid: 121da31e534ea054495054bb4d30a718, type: 2}
-      minAmount: 30
-      maxAmount: 75
-    - item: {fileID: 11400000, guid: d0ec9c8cf697d534089353d46e18d3b0, type: 2}
-      minAmount: 16500
-      maxAmount: 22500
-    - item: {fileID: 11400000, guid: 7329497db35b6874f9233cd1ea289622, type: 2}
-      minAmount: 30
-      maxAmount: 75
-    - item: {fileID: 11400000, guid: a9d6a17dbdf827743a53bcd5715db989, type: 2}
-      minAmount: 90
-      maxAmount: 120
-    - item: {fileID: 11400000, guid: 206f3c5e449cd484185eba40e1ff1d7c, type: 2}
-      minAmount: 90
-      maxAmount: 120
-    - item: {fileID: 11400000, guid: c57528c5c3d3f0941a0a2bcb9c8f4533, type: 2}
-      minAmount: 150
-      maxAmount: 375
-    - item: {fileID: 11400000, guid: d0ec9c8cf697d534089353d46e18d3b0, type: 2}
-      minAmount: 15000
-      maxAmount: 18000
-    - item: {fileID: 11400000, guid: 2b7a362a552d52645823b82e0b101449, type: 2}
-      minAmount: 22
-      maxAmount: 52
-  specialItem: {fileID: 11400000, guid: 121da31e534ea054495054bb4d30a718, type: 2}
   preset:
   - item: {fileID: 11400000, guid: 121da31e534ea054495054bb4d30a718, type: 2}
     minAmount: 20
@@ -93,3 +67,4 @@ MonoBehaviour:
     maxAmount: 35
   rewardSetCount: 2
   maxMultiplier: 1.5
+  specialItem: {fileID: 11400000, guid: 121da31e534ea054495054bb4d30a718, type: 2}

@@ -30,6 +30,9 @@ namespace Runtime.UI
         private SceneTransitionView _transition;
         private SignalBus _signalBus;
 
+        private const float ViewportCenterRatio = 0.5f;
+        private const float PunchScaleYRatio = 0.5f;
+
         private readonly List<StageItemView> _stageItems = new();
 
         #endregion
@@ -130,13 +133,14 @@ namespace Runtime.UI
             Canvas.ForceUpdateCanvases();
             var itemRect = (RectTransform)_stageItems[zone - 1].transform;
             float itemLocalX = _scrollRect.content.InverseTransformPoint(itemRect.position).x;
-            float viewportHalfWidth = _scrollRect.viewport.rect.width * 0.5f;
+            float viewportHalfWidth = _scrollRect.viewport.rect.width * ViewportCenterRatio;
             _scrollRect.content.DOAnchorPosX(-itemLocalX + viewportHalfWidth, _slideDuration).SetEase(Ease.OutCubic);
         }
 
         private void PunchFrame()
         {
-            _currentStageFrame.DOPunchScale(new Vector3(_punchScale, _punchScale * 0.5f, 0f), _punchDuration,
+            _currentStageFrame.DOPunchScale(new Vector3(_punchScale, _punchScale * PunchScaleYRatio, 0f),
+                _punchDuration,
                 _punchVibrato, _punchElasticity);
         }
 

@@ -44,7 +44,8 @@ namespace Runtime.Core
         {
             int total = 0;
             foreach (var item in _items)
-                if (item.Config.isCurrency) total += item.Amount;
+                if (item.Config.IsCurrency)
+                    total += item.Amount;
             return total;
         }
 

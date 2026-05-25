@@ -21,16 +21,16 @@ namespace Runtime.Audio
             _spinSource.clip = _config.spinTickClip;
             _spinSource.Play();
         }
-        public void PlayBombSfx()       => PlayMain(_config.bombClip);
-        public void StopBombSfx()       => _sfxSource?.Stop();
-        public void PlayRewardSfx()     => PlayOneShot(_config.rewardClip);
+
+        public void PlayBombSfx() => PlayMain(_config.bombClip);
+        public void StopBombSfx() => _sfxSource?.Stop();
+        public void PlayRewardSfx() => PlayOneShot(_config.rewardClip);
         public void PlayGoldRewardSfx() => PlayOneShot(_config.goldRewardClip);
         public void PlayTakeRewardSfx() => PlayOneShot(_config.takeRewardClip);
-        public void PlayCollectSfx()           => PlayOneShot(_config.collectRewardsClip);
-        public void PlayItemPopSfx()           => PlayOneShot(_config.itemPopClip);
+        public void PlayCollectSfx() => PlayOneShot(_config.collectRewardsClip);
+        public void PlayItemPopSfx() => PlayOneShot(_config.itemPopClip);
         public void PlaySpecialItemOpenSfx() => PlayOneShot(_config.specialItemOpenClip);
 
-        // PlayMain: main clip slot — Stop() ile durdurulabilir (PlayOneShot'ları etkilemez)
         private void PlayMain(AudioClip clip)
         {
             if (clip == null || _sfxSource == null) return;

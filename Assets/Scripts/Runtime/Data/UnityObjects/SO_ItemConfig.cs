@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using Runtime.Enums;
+using UnityEngine;
 
 namespace Runtime.Data.UnityObjects
 {
@@ -7,8 +8,9 @@ namespace Runtime.Data.UnityObjects
     {
         public string itemName;
         public Sprite icon;
-        public bool isBomb;
-        public bool isCurrency;
-        public bool isSpecial;
+        public ItemType itemType;
+
+        public bool IsBomb => itemType == ItemType.Bomb;
+        public bool IsCurrency => itemType == ItemType.Currency;
     }
 }

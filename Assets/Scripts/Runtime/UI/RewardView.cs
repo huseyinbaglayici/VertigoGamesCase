@@ -25,7 +25,7 @@ namespace Runtime.UI
         private SO_RewardAnimationConfig.ItemPopIn _cfg;
         private SO_RewardAnimationConfig.ItemSpreadBurst _itemCfg;
 
-        private const string CollectButtonName = "ui_button_reward_exit";
+        private const string CollectButtonName = "ui_button_collect";
 
         private void OnValidate()
         {
@@ -71,6 +71,7 @@ namespace Runtime.UI
             foreach (Transform child in _content)
                 Destroy(child.gameObject);
 
+            _collectButton.interactable = true;
             gameObject.SetActive(true);
 
             int index = 0;
@@ -100,6 +101,8 @@ namespace Runtime.UI
 
         private void OnCollectClicked()
         {
+            _collectButton.interactable = false;
+
             int total = _inventoryManager.GetTotalCurrency();
             if (total > 0) _currencyManager.Collect(total);
 

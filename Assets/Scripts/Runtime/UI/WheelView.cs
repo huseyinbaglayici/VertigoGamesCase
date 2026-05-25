@@ -289,7 +289,8 @@ namespace Runtime.UI
             var rewardSet = _zoneManager.GetCurrentRewardSet(config);
             _wheelBaseImage.sprite = config.baseSprite;
             _indicatorImage.sprite = config.indicatorSprite;
-            for (int i = 0; i < _slotViews.Length; i++)
+            int slotCount = Mathf.Min(_slotViews.Length, rewardSet.rewards.Length);
+            for (int i = 0; i < slotCount; i++)
             {
                 var entry = rewardSet.rewards[i];
                 int amount = entry.item.IsBomb

@@ -32,6 +32,8 @@ namespace Runtime.UI
         private SO_GameConfig _gameConfig;
         private IAudioService _audioService;
         private Tween _showDelayTween;
+        private Tween _yRotTween;
+        private Tween _xRotTween;
 
         #endregion
 
@@ -71,6 +73,8 @@ namespace Runtime.UI
 
             _collectButton.onClick.RemoveListener(OnContinueClicked);
             _showDelayTween?.Kill();
+            _yRotTween?.Kill();
+            _xRotTween?.Kill();
             if (_effectImage != null) _effectImage.DOKill();
             if (_itemIcon != null) _itemIcon.transform.DOKill();
         }
@@ -105,6 +109,8 @@ namespace Runtime.UI
         private void Hide()
         {
             _showDelayTween?.Kill();
+            _yRotTween?.Kill();
+            _xRotTween?.Kill();
             if (_effectImage != null) _effectImage.DOKill();
             if (_itemIcon != null) _itemIcon.transform.DOKill();
             gameObject.SetActive(false);
@@ -139,13 +145,13 @@ namespace Runtime.UI
                 iconT.localRotation = Quaternion.identity;
 
                 float xAngle = 0f, yAngle = 0f;
-                DOTween.To(() => yAngle, v =>
+                _yRotTween = DOTween.To(() => yAngle, v =>
                     {
                         yAngle = v;
                         iconT.localRotation = Quaternion.Euler(xAngle, yAngle, 0f);
                     }, FlipYMaxAngle, FlipYDuration)
                     .From(-FlipYMaxAngle).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
-                DOTween.To(() => xAngle, v =>
+                _xRotTween = DOTween.To(() => xAngle, v =>
                     {
                         xAngle = v;
                         iconT.localRotation = Quaternion.Euler(xAngle, yAngle, 0f);

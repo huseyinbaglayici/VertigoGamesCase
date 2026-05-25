@@ -9,9 +9,11 @@ namespace Runtime.Core
 {
     public class ZoneManager : IZoneManager, IDisposable
     {
+        private const int FirstZone = 1;
+
         private readonly SO_GameConfig _gameConfig;
         private readonly SignalBus _signalBus;
-        private int _currentZone = 1;
+        private int _currentZone = FirstZone;
 
         public int CurrentZone => _currentZone;
         public event Action<int> OnZoneChanged;
@@ -67,7 +69,7 @@ namespace Runtime.Core
 
         private void OnReset()
         {
-            _currentZone = 1;
+            _currentZone = FirstZone;
             OnZoneChanged?.Invoke(_currentZone);
         }
     }

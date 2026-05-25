@@ -21,7 +21,7 @@ namespace Runtime.UI
         [SerializeField] private float _punchDuration = 0.4f;
         [SerializeField] private int _punchVibrato = 5;
         [SerializeField] private float _punchElasticity = 0.5f;
-        [SerializeField] private int _instantiatePerFrame = 5;
+        [SerializeField, Min(1)] private int _instantiatePerFrame = 5;
         [SerializeField] private RectTransform _currentStageFrame;
 
         private IZoneManager _zoneManager;
